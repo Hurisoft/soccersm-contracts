@@ -2,7 +2,7 @@
 
 A wierd diagram of how the smart contract is all linked together.
 
-![Architecture](https://github.com/Hurisoft/soccersm-contracts/blob/main/images/blockxchallenge-contracts.png)
+![Architecture](https://github.com/Hurisoft/soccersm-contracts/blob/main/soccersm-contracts.png)
 
 ## Initial Deployment & Setup Steps
 

@@ -25,7 +25,7 @@ A wierd diagram of how the smart contract is all linked together.
 #### Topic Registry
 https://explorer-testnet.morphl2.io/address/0x31556A6Fd2D2De4775B4df43c877cF7178499b49
 #### Soccersm Challenge Pool
-
+https://explorer-testnet.morphl2.io/address/0xd96c0BDC90b3fc41F15d348c3D539e427162F5B7
 #### Pool Manager
 
 #### Symbol Feed USD

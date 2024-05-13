@@ -1,44 +1,47 @@
-import { HardhatUserConfig } from "hardhat/types";
-import "@nomicfoundation/hardhat-toolbox";
-import "dotenv/config";
+import * as dotenv from "dotenv";
 
-const morphTestnet = {
-  url: process.env.MORPH_TESTNET_URL || "",
-  accounts:
-    process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-};
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+
+dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.24",
     settings: {
+      viaIR: true,
       optimizer: {
         enabled: true,
         runs: 200,
       },
-      viaIR: true,
-    },
+      evmVersion: "london"
+    }
   },
   networks: {
-    morphTestnet,
+    morphTestnet: {
+      url: process.env.MORPH_TESTNET_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 20000000000 // 2 gwei in wei
+    },
+    
   },
   etherscan: {
     apiKey: {
-      eth: "DUU2RIG2D7G2NT3FST6HHJNRQSVQFD1XCI",
-      optimisticGoerli: "SZZNTRAM27FZW2V3TFBEB3TIYHH9US543A",
-      morphTestnet: "anything",
+      morphTestnet: 'anything',
     },
     customChains: [
       {
-        network: "morphTestnet",
-        chainId: 2710,
+        network: 'morphTestnet',
+        chainId: 2810,
         urls: {
-          apiURL: "https://explorer-api-testnet.morphl2.io/api? ",
-          browserURL: "https://explorer-testnet.morphl2.io/",
+          apiURL: 'https://explorer-api-holesky.morphl2.io/api? ',
+          browserURL: 'https://explorer-holesky.morphl2.io/',
         },
       },
     ],
   },
+  
 };
 
 export default config;

@@ -22,15 +22,15 @@ A wierd diagram of how the smart contract is all linked together.
 ### Deployments
 
 ### Morph
-#### Topic Registry
-https://explorer-testnet.morphl2.io/address/0x31556A6Fd2D2De4775B4df43c877cF7178499b49
 #### Soccersm Challenge Pool
-https://explorer-testnet.morphl2.io/address/0xd96c0BDC90b3fc41F15d348c3D539e427162F5B7
+https://explorer-holesky.morphl2.io/address/0xe1203004c4D860Ee3B6E8067B3E30Ec10948d3e6
+#### Topic Registry
+https://explorer-holesky.morphl2.io/address/0x8DB769ccD2f5946a94fCe8b3Ad9a296D5309c36c
 #### Pool Manager
-
+https://explorer-holesky.morphl2.io/address/0x06E33C181394c4910D078F71855fF6c5ccA0f375
 #### Symbol Feed USD
-
+https://explorer-holesky.morphl2.io/address/0xdf837003B2e9D46dfb9C83Dc928503fa21575bB6
 #### Asset Price
-
+https://explorer-holesky.morphl2.io/address/0xF0E776168934e0D14c511EbB7acd7FC69F03f70B
 #### Chainlink Keeper
 

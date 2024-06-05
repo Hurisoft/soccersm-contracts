@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.26;
 
-import "./interfaces/ITopicRegistry.sol";
+import "../interfaces/ITopicRegistry.sol";
 
 contract TopicRegistry is ITopicRegistry {
     uint private topicIdCounter;

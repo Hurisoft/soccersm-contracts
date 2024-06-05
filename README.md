@@ -1,8 +1,6 @@
 # Soccersm Challenge Pools
 
-A wierd diagram of how the smart contract is all linked together.
-
-![Architecture](https://github.com/Hurisoft/soccersm-contracts/blob/main/soccersm-contracts.png)
+[Specification](./specification.md)
 
 ## Initial Deployment & Setup Steps
 

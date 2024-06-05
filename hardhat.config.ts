@@ -14,34 +14,41 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 200,
       },
-      evmVersion: "london"
-    }
+      evmVersion: "london",
+    },
   },
   networks: {
     morphTestnet: {
-      url: process.env.MORPH_TESTNET_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 20000000000 // 2 gwei in wei
+      url: "https://rpc-quicknode-holesky.morphl2.io",
+      accounts: [process.env.PRIVATE_KEY!],
+      gasPrice: 20000000000, // 2 gwei in wei
     },
-    
+    optimism: {
+      url: "https://optimism-mainnet.infura.io/v3/82de4c56f4364dd899635d8ebbc349cc",
+      chainId: 10,
+      accounts: [process.env.PRIVATE_KEY!],
+    },
+    optimismTestnet: {
+      url: "https://optimism-sepolia.infura.io/v3/82de4c56f4364dd899635d8ebbc349cc",
+      chainId: 11155420,
+      accounts: [process.env.PRIVATE_KEY!],
+    },
   },
   etherscan: {
     apiKey: {
-      morphTestnet: 'anything',
+      morphTestnet: "anything",
     },
     customChains: [
       {
-        network: 'morphTestnet',
+        network: "morphTestnet",
         chainId: 2810,
         urls: {
-          apiURL: 'https://explorer-api-holesky.morphl2.io/api? ',
-          browserURL: 'https://explorer-holesky.morphl2.io/',
+          apiURL: "https://explorer-api-holesky.morphl2.io/api? ",
+          browserURL: "https://explorer-holesky.morphl2.io/",
         },
       },
     ],
   },
-  
 };
 
 export default config;

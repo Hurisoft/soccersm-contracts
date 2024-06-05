@@ -49,7 +49,7 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 - `closeChallenge`
 - `batchCloseChallenges`
 - `cancelChallenge`
-- `maturedChallenges`
+- `withdrawWinnings`
 
 #### TopicsRegistry Contract
 
@@ -141,3 +141,87 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 
 ![States](./challenge_pool_states.png)
 
+### Open State
+
+- The initial state of every pool is open.
+- In open state anyone can join a pool.
+
+
+### Locked State
+
+- After some time a pool becomes locked.
+- Locked state prevents new participants from joining.
+- This state occurs automatically based on time to maturity.
+
+### Mature State
+
+- A pool enters mature state when the maturity time is up.
+- This state occurs automatically by comparing current block time to maturity time.
+
+### Closed State
+
+- A pool enters closed state after `closeChallenge` is successfully called.
+- After closed state players can withdraw their profit in case of win.
+
+### Stale State
+
+- A pool becomes stale if an evaluator fails to provide result for an event.
+- If pool evaluation fails, it can be retried 3 times in exponetial time intervals.
+- If after the 3 trials the pool fails to evaluate, it will be moved to Manual.
+
+### Manual State
+
+- A pool in manual state allows an admin account to decide the actual outcome of the pool. This account can be a DAO controlled account which allows multiple witnesses to attest the real world to the smart contract.
+- From this state it can also be decided to cancel the pool
+
+### Cancelled State
+
+- A pool in cancelled state has no winners or loosers.
+- All participants are able to withdraw their stake.
+
+## Soccersm Wheel Specification
+
+### What is Wheel?
+
+- It is a smart contract powered game in the soccersm ecosystem.
+- Similar to spin the wheel.
+
+### How it works.
+
+- User stakes an Trophies to spin the wheel.
+- Soccersm platform sends the results of the action to the smart contract.
+- Trophies won are transferred immediately.
+
+### Entities
+
+#### Spin
+
+- Represents a play initialization.
+- A spin is initialized by one user.
+
+## Soccersm Raffle Specification
+
+### What is Raffle?
+
+- A smart contract game that allows players to stake fixed amounts during an open period.
+- After the open period a few of the players are randomly picked using a random oracle
+- The entire pool is distributed amongst them.
+
+### How it works.
+
+- Players stake a fixed amount during an open period.
+- An oracle randomly submits a seed which is used to pick winners.
+- Entire stake is split amongst winners.
+- This is a repeating hourly cylcles called epochs.
+
+### Entities
+
+#### Raffle
+
+- Represents pool for each epoch of the raffle.
+- There can only be one `Raffle` at a time.
+
+#### Methods
+- `createRaffle`
+- `joinRaffle`
+- `withdrawWinnings`

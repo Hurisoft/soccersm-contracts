@@ -13,7 +13,7 @@
 
 A wierd diagram of the core smart contract systems.
 
-![Architecture](./challenge_pool.png)
+![Architecture](./challenge_pool_contracts.png)
 
 The core of challenge pools is powered by a collections of contracts, oracles and smart contract automation systems.
 

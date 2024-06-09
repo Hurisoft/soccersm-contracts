@@ -188,7 +188,7 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 
 ### How it works.
 
-- User stakes an Trophies to spin the wheel.
+- User stakes with Trophies to spin the wheel.
 - Soccersm platform sends the results of the action to the smart contract.
 - Trophies won are transferred immediately.
 
@@ -198,6 +198,9 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 
 - Represents a play initialization.
 - A spin is initialized by one user.
+
+### Methods
+- `spinWheel`
 
 ## Soccersm Raffle Specification
 
@@ -221,7 +224,7 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 - Represents pool for each epoch of the raffle.
 - There can only be one `Raffle` at a time.
 
-#### Methods
+### Methods
 - `createRaffle`
 - `joinRaffle`
 - `withdrawWinnings`

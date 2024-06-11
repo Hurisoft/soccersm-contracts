@@ -8,25 +8,25 @@ import { ethers } from "hardhat";
 
 describe("TopicRegistry", function () {
   async function deployTopicRegistry() {
-    const [owner, otherAccount, evaluator, feed] = await ethers.getSigners();
+    const [owner, otherAccount, evaluator] = await ethers.getSigners();
 
     const TopicRegistry = await ethers.getContractFactory("TopicRegistry");
     const registry = await TopicRegistry.deploy();
 
-    return { registry, owner, otherAccount, evaluator, feed };
+    return { registry, owner, otherAccount, evaluator };
   }
 
   async function createTopics() {
-    const { registry, owner, otherAccount, evaluator, feed } =
+    const { registry, owner, otherAccount, evaluator } =
       await loadFixture(deployTopicRegistry);
 
     const title = "Asset Price Above";
     const description =
       "Predict whether the exit price will be higher than the target price at the end of the given time period.";
 
-    await registry.createTopic(title, description, evaluator, feed);
+    await registry.createTopic(title, description, evaluator);
 
-    return { registry, owner, otherAccount, evaluator, feed };
+    return { registry, owner, otherAccount, evaluator };
   }
 
   describe("Deployment", function () {
@@ -40,7 +40,7 @@ describe("TopicRegistry", function () {
       const { registry, owner, otherAccount } = await loadFixture(createTopics);
     });
     it("Should fail with empty title or description", async function () {
-      const { registry, owner, otherAccount, evaluator, feed } =
+      const { registry, owner, otherAccount, evaluator } =
         await loadFixture(createTopics);
       const emptyTitle = "";
       const emptyDescription = "";
@@ -49,27 +49,15 @@ describe("TopicRegistry", function () {
         "Predict whether the exit price will be higher than the target price at the end of the given time period.";
 
       await expect(
-        registry.createTopic(emptyTitle, description, evaluator, feed)
+        registry.createTopic(emptyTitle, description, evaluator)
       ).to.revertedWithCustomError(registry, "EmptyString");
 
       await expect(
-        registry.createTopic(title, emptyDescription, evaluator, feed)
+        registry.createTopic(title, emptyDescription, evaluator)
       ).to.revertedWithCustomError(registry, "EmptyString");
-    });
-    it("Should fail with equal evaluator and eventfeed", async function () {
-      const { registry, owner, otherAccount, evaluator, feed } =
-        await loadFixture(deployTopicRegistry);
-
-      const title = "Asset Price Above";
-      const description =
-        "Predict whether the exit price will be higher than the target price at the end of the given time period.";
-
-      await expect(
-        registry.createTopic(title, description, evaluator, evaluator)
-      ).to.revertedWithCustomError(registry, "EvaluatorIsEventFeed");
     });
     it("Should fail with invalid owner", async function () {
-      const { registry, owner, otherAccount, evaluator, feed } =
+      const { registry, owner, otherAccount, evaluator } =
         await loadFixture(deployTopicRegistry);
 
       const title = "Asset Price Above";
@@ -79,7 +67,7 @@ describe("TopicRegistry", function () {
       await expect(
         registry
           .connect(otherAccount)
-          .createTopic(title, description, evaluator, feed)
+          .createTopic(title, description, evaluator)
       ).to.revertedWithCustomError(registry, "OwnableUnauthorizedAccount");
     });
   });
@@ -100,7 +88,7 @@ describe("TopicRegistry", function () {
       );
     });
     it("Should fail with invalid owner", async function () {
-      const { registry, owner, otherAccount, evaluator, feed } =
+      const { registry, owner, otherAccount, evaluator } =
         await loadFixture(deployTopicRegistry);
 
       const topicId = 0;
@@ -130,7 +118,7 @@ describe("TopicRegistry", function () {
       ).to.revertedWithCustomError(registry, "InvalidTopic");
     });
     it("Should fail with invalid owner", async function () {
-      const { registry, owner, otherAccount, evaluator, feed } =
+      const { registry, owner, otherAccount, evaluator } =
         await loadFixture(createTopics);
 
       const topicId = 0;

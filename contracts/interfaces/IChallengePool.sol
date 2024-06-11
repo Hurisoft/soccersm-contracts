@@ -60,7 +60,7 @@ abstract contract IChallengePool is Helpers {
     uint256 public staleExtensionPeriod = 1 hours;
     address public feeAddress;
     ITopicRegistry public topicRegistry;
-    IERC1155 public trophies;
+    IERC20 public trophies;
     IERC20 public balls;
 
     // ============ ================= ==============

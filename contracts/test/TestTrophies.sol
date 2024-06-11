@@ -5,12 +5,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/ITrophies.sol";
 
-contract Trophies is ITrophies, Ownable {
+contract TestTrophies is ITrophies, Ownable {
     mapping(address account => bool) private _minters;
 
     constructor()
-        ERC20("Soccersm Trophies", "ST")
-        ERC20Permit("Soccersm Trophies")
+        ERC20("Test Trophies", "TT")
+        ERC20Permit("Test Trophies")
         Ownable(msg.sender)
     {}
 

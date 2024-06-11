@@ -37,7 +37,7 @@ contract Soccersm is IChallengePool, Ownable {
         staleExtensionPeriod = _staleExtensionPeriod;
         feeAddress = _feeAddress;
         balls = IERC20(_ballsAddress);
-        trophies = IERC1155(_trophiesAddress);
+        trophies = IERC20(_trophiesAddress);
         topicRegistry = ITopicRegistry(_topicRegistry);
     }
     function setFeeAddress(address _feeAddress) external override onlyOwner {
@@ -85,7 +85,7 @@ contract Soccersm is IChallengePool, Ownable {
     function setTrophiesAddress(
         address _trophiesAddress
     ) external override onlyOwner {
-        trophies = IERC1155(_trophiesAddress);
+        trophies = IERC20(_trophiesAddress);
     }
 
     function setBallsAddress(

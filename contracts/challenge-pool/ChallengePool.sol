@@ -3,6 +3,8 @@ pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 import "../interfaces/IChallengePool.sol";
 import "../interfaces/ITopicRegistry.sol";
@@ -19,7 +21,10 @@ contract Soccersm is IChallengePool, Ownable {
         uint256 _minMaturityPeriod,
         uint256 _maxStaleRetries,
         uint256 _staleExtensionPeriod,
-        address _feeAddress
+        address _feeAddress,
+        address _topicRegistry,
+        address _trophiesAddress,
+        address _ballsAddress
     ) Ownable(msg.sender) {
         poolFee = _poolFee;
         joinPeriod = _joinPeriod;
@@ -31,6 +36,9 @@ contract Soccersm is IChallengePool, Ownable {
         maxStaleRetries = _maxStaleRetries;
         staleExtensionPeriod = _staleExtensionPeriod;
         feeAddress = _feeAddress;
+        balls = IERC20(_ballsAddress);
+        trophies = IERC1155(_trophiesAddress);
+        topicRegistry = ITopicRegistry(_topicRegistry);
     }
     function setFeeAddress(address _feeAddress) external override onlyOwner {
         feeAddress = _feeAddress;
@@ -51,8 +59,10 @@ contract Soccersm is IChallengePool, Ownable {
     }
 
     function setMaxEventsPerChallenge(
-        uint256 _maxChallengeEvents
-    ) external override onlyOwner {}
+        uint256 _maxEventsPerChallenge
+    ) external override onlyOwner {
+        maxEventsPerChallenge = _maxEventsPerChallenge;
+    }
 
     function setMinStakeAmount(
         uint256 _minStakeAmount
@@ -64,6 +74,24 @@ contract Soccersm is IChallengePool, Ownable {
         uint256 _maxPlayersPerPool
     ) external override onlyOwner {
         maxPlayersPerPool = _maxPlayersPerPool;
+    }
+
+    function setTopicRegistry(
+        address _topicRegistry
+    ) external override onlyOwner {
+        topicRegistry = ITopicRegistry(_topicRegistry);
+    }
+
+    function setTrophiesAddress(
+        address _trophiesAddress
+    ) external override onlyOwner {
+        trophies = IERC1155(_trophiesAddress);
+    }
+
+    function setBallsAddress(
+        address _ballsAddress
+    ) external override onlyOwner {
+        balls = IERC20(_ballsAddress);
     }
 
     function setMaxMaturityPeriod(
@@ -85,10 +113,34 @@ contract Soccersm is IChallengePool, Ownable {
     }
 
     function closeFromManual(
-        uint256 _challengeId
-    ) external override onlyOwner {}
+        uint256 _challengeId,
+        Prediction _manualResult
+    )
+        external
+        override
+        onlyOwner
+        validChallenge(_challengeId)
+        validPrediction(_manualResult)
+    {
+        Challenge storage challenge = challengePools[_challengeId];
+        PoolState currentState = _poolState(challenge);
+        if (currentState != PoolState.manual) {
+            revert ActionNotAllowedForState(currentState);
+        }
+        challenge.result = _manualResult;
+        challenge.state = PoolState.manual;
+        emit ClosedChallengePool(_challengeId, msg.sender, challenge.state);
+    }
 
     function cancelFromManual(
         uint256 _challengeId
-    ) external override onlyOwner {}
+    ) external override onlyOwner validChallenge(_challengeId) {
+        Challenge storage challenge = challengePools[_challengeId];
+        PoolState currentState = _poolState(challenge);
+        if (currentState != PoolState.manual) {
+            revert ActionNotAllowedForState(currentState);
+        }
+        challenge.state = PoolState.cancelled;
+        emit CancelChallengePool(_challengeId, msg.sender, challenge.state);
+    }
 }

@@ -59,15 +59,15 @@ abstract contract IChallengePool is Helpers {
     uint256 public maxStaleRetries = 3;
     uint256 public staleExtensionPeriod = 1 hours;
     address public feeAddress;
+    ITopicRegistry public topicRegistry;
+    IERC1155 public trophies;
+    IERC20 public balls;
 
     // ============ ================= ==============
     mapping(address => mapping(uint => Prediction))
-        private userChallengePrediction;
-    mapping(address => mapping(uint => bool)) private userChallengeWithdrawal;
-    IERC20 public balls;
-    ITopicRegistry public topicRegistry;
-    IERC1155 public trophies;
-    Challenge[] private challengePools;
+        internal userChallengePrediction;
+    mapping(address => mapping(uint => bool)) internal userChallengeWithdrawal;
+    Challenge[] internal challengePools;
 
     // ============ ================= ==============
     event StakeTokenAdded(address indexed token);
@@ -86,8 +86,6 @@ abstract contract IChallengePool is Helpers {
     event ClosedChallengePool(
         uint256 indexed challengeId,
         address indexed closer,
-        uint256 yesParticipants,
-        uint256 noParticipants,
         PoolState state
     );
     event CancelChallengePool(
@@ -197,6 +195,12 @@ abstract contract IChallengePool is Helpers {
     function setMaxMaturityPeriod(uint256 _maxMaturity) external virtual;
 
     function setMaxStaleRetries(uint256 _maxStaleRetries) external virtual;
+
+    function setTopicRegistry(address _topicRegistry) external virtual;
+
+    function setTrophiesAddress(address _trophiesAddress) external virtual;
+
+    function setBallsAddress(address _ballsAddress) external virtual;
 
     function setStaleExtensionTime(
         uint256 _staleExtensionTime
@@ -492,13 +496,7 @@ abstract contract IChallengePool is Helpers {
         }
         challenge.result = result ? Prediction.yes : Prediction.no;
         challenge.state = PoolState.closed;
-        emit ClosedChallengePool(
-            _challengeId,
-            msg.sender,
-            challenge.yesParticipants,
-            challenge.noParticipants,
-            challenge.state
-        );
+        emit ClosedChallengePool(_challengeId, msg.sender, challenge.state);
     }
 
     function batchCloseChallenge(uint256[] memory _challengeIds) external {
@@ -530,7 +528,10 @@ abstract contract IChallengePool is Helpers {
         }
     }
 
-    function closeFromManual(uint256 _challengeId) external virtual;
+    function closeFromManual(
+        uint256 _challengeId,
+        Prediction _manualPrediction
+    ) external virtual;
 
     function cancelFromManual(uint256 _challengeId) external virtual;
 

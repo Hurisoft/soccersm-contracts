@@ -51,6 +51,19 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 - `cancelChallenge`
 - `withdrawWinnings`
 
+##### Protocol Variables
+
+- `poolFee` - percentage of stake to be charged as pool fee when creating or joining a pool
+- `joinPeriod` - fraction of the pool period that users can join. 
+- `maxMaturityPeriod` - can't have a maturity period above this value. Currently 3 months.
+- `maxPlayersPerPool` - total number of players that can join a pool. Currently 100 players.
+- `maxEventsPerChallenge` - maximum number of events that can be placed on a combo challenge.
+- `feeAddress` - Address to which accumulated fees are sent to.
+- `minMaturityPeriod` - can't have a maturity period below this value. Currently 1 hour.
+- `minStakeAmount` - minmum balls token that can be staked
+- `maxStaleRetries` - number of times to retry closing after challenge becomes stale
+- `staleExtensionPeriod` - how long to wait after each stale retry
+
 #### TopicsRegistry Contract
 
 - This contract keeps track of various pool topics, whether they are active or not.

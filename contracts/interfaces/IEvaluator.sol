@@ -1,21 +1,19 @@
-// // SPDX-License-Identifier: UNLICENSED
-// pragma solidity ^0.8.26;
-// import "./IChallengePool.sol";
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.26;
+import "./IChallengePool.sol";
 
-// interface IEvaluator {
-//     function evaluateChallenge(
-//         IChallengePool.Challenge calldata challenge
-//     )
-//         external
-//         view
-//         returns (
-//             int results,
-//             address[] memory losers,
-//             address[] memory winners
-//         );
+interface IEvaluator {
+    function evaluateEvent(
+        IChallengePool.ChallengeEvent calldata _challengeEvent
+    ) external view returns (IChallengePool.Prediction);
 
-//     function validateChallenge(
-//         string memory params,
-//         int proposal
-//     ) external view returns (bool);
-// }
+    function validateEvent(
+        IChallengePool.ChallengeEvent calldata _challengeEvent
+    ) external view returns (bool);
+
+    function actualMaturity(
+        IChallengePool.ChallengeEvent calldata challengeEvent
+    ) external view returns (uint256);
+
+    function eventFeed() external view returns(address);
+}

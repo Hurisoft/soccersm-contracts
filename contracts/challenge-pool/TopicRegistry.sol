@@ -3,8 +3,10 @@ pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/ITopicRegistry.sol";
+import "../helpers.sol";
+import "../interfaces/IEvaluator.sol";
 
-contract TopicRegistry is Ownable, ITopicRegistry {
+contract TopicRegistry is Ownable, ITopicRegistry, Helpers {
     constructor() Ownable(msg.sender) {}
 
     Topic[] private registry;
@@ -16,50 +18,29 @@ contract TopicRegistry is Ownable, ITopicRegistry {
         _;
     }
 
-    modifier positiveAddress(address addr) {
-        if (address(0) == addr) {
-            revert ZeroAddress();
-        }
-        _;
-    }
-
-    modifier nonEmptyString(string memory str) {
-        if (bytes(str).length == 0) {
-            revert EmptyString();
-        }
-        _;
-    }
-
     function createTopic(
         string memory _title,
         string memory _description,
-        address _evaluator,
-        address _eventFeed
+        address _evaluator
     )
         external
         onlyOwner
         positiveAddress(_evaluator)
-        positiveAddress(_eventFeed)
         nonEmptyString(_title)
         nonEmptyString(_description)
         returns (uint)
     {
-        if (_evaluator == _eventFeed) {
-            revert EvaluatorIsEventFeed();
-        }
         registry.push(
             Topic({
                 title: _title,
                 description: _description,
                 evaluator: _evaluator,
-                eventFeed: _eventFeed,
                 state: TopicState.active
             })
         );
         emit NewTopic(
             registry.length,
             _evaluator,
-            _eventFeed,
             _title,
             _description,
             TopicState.active
@@ -77,7 +58,22 @@ contract TopicRegistry is Ownable, ITopicRegistry {
         emit EnableTopic(topicId, TopicState.disabled);
     }
 
-    function getTopic(uint topicId) external view validTopic(topicId) returns (Topic memory) {
+    function getTopic(
+        uint topicId
+    ) external view validTopic(topicId) returns (Topic memory) {
         return registry[topicId];
+    }
+
+    function topicEvaluator(
+        uint256 topicId
+    ) external view returns (IEvaluator) {
+        return IEvaluator(registry[topicId].evaluator);
+    }
+
+    function activeTopic(uint256 topicId) external view returns (bool) {
+        if (topicId >= registry.length) {
+            return false;
+        }
+        return registry[topicId].state == TopicState.active;
     }
 }

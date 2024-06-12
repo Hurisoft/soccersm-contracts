@@ -5,8 +5,9 @@ import "hardhat/console.sol";
 import "../interfaces/IChallengePool.sol";
 import "../interfaces/IEvaluator.sol";
 
+import "../utils/helpers.sol";
 
-contract DummyEvaluator is IEvaluator {
+contract DummyEvaluator is IEvaluator, Helpers {
     bool public validateResult = true;
     IChallengePool.Prediction public evaluateResult =
         IChallengePool.Prediction.yes;
@@ -29,25 +30,29 @@ contract DummyEvaluator is IEvaluator {
 
     function evaluateEvent(
         IChallengePool.ChallengeEvent calldata _challengeEvent
-    ) external view returns (IChallengePool.Prediction) {
+    ) external view override returns (IChallengePool.Prediction) {
         console.log(_challengeEvent.maturity, _challengeEvent.topicId);
+        (uint256 matchId, string memory outcome) = abi.decode(
+            _challengeEvent.eventParam,
+            (uint256, string)
+        );
+        console.log(matchId);
+        console.log(outcome);
         return evaluateResult;
     }
 
-    function validateEvent(
-        IChallengePool.ChallengeEvent calldata _challengeEvent
-    ) external view returns (bool) {
-        console.log(_challengeEvent.maturity, _challengeEvent.topicId);
-        return validateResult;
+    function decode(bytes calldata _params) external pure override returns (bool) {
+        (uint256 matchId, string memory outcome) = abi.decode(
+            _params,
+            (uint256, string)
+        );
+        console.log(matchId);
+        console.log(outcome);
+        return true;
     }
 
-    function actualMaturity(
-        IChallengePool.ChallengeEvent calldata challengeEvent
-    ) external pure returns (uint256) {
-        return challengeEvent.maturity;
+     function dataProvider() external view override returns (ITopicDataProvider) {
+        return ITopicDataProvider(address(this));
     }
 
-    function eventFeed() external view returns (address) {
-        return address(this);
-    }
 }

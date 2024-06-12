@@ -95,21 +95,19 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 - `evaluatePool`
 - `validatePool`
 
-#### TopicEventFeed Contract
+#### TopicDataProvider Contract
 
 - This contract keeps track of real world events.
-- It provide event feed for a particular topic.
-- Evaluator contracts rely on this contract for real world information.
-- This contract in turn relies on oracles or could act directly as oracle.
-- It also handles registration of events. For example adding upcoming football matches. Only events registered on this contract can be predicted on.
-- Allows for manual event updates in case of automation failure.
+- It provides of chain data to the evaluator.
+- It uses a request response model.
+- It is a pull oracle.
 
 #####
 
-- `registerEvent`
-- `updateEvent`
-- `addEvent`
-- `removeEvent`
+- `requestData` - ask the oracle for the data
+- `provideData` - data is submitted to oracle as soon as possible
+- `getData` - get data requested
+- `hasData` - check if oracle has the data
 
 ## Application Flows
 

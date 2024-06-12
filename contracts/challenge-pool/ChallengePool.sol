@@ -10,7 +10,7 @@ import "../interfaces/IChallengePool.sol";
 import "../interfaces/ITopicRegistry.sol";
 import "../interfaces/IEvaluator.sol";
 
-contract Soccersm is IChallengePool, Ownable {
+contract ChallengePool is IChallengePool, Ownable {
     constructor(
         uint256 _poolFee,
         uint256 _joinPeriod,

@@ -21,8 +21,19 @@ abstract contract Helpers {
 
     // @dev computes fraction of [value] in [bps]
     // 100 bps is equivalent to 1%
-    function basisPoint(uint256 value, uint256 bps) public pure returns (uint256) {
+    function basisPoint(
+        uint256 value,
+        uint256 bps
+    ) public pure returns (uint256) {
         require((value * bps) >= 10_000);
         return Math.mulDiv(value, bps, 10_000);
+    }
+
+    function compareStrings(
+        string memory a,
+        string memory b
+    ) public pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) ==
+            keccak256(abi.encodePacked((b))));
     }
 }

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "./ITopicRegistry.sol";
 import "./IEvaluator.sol";
-import "../helpers.sol";
+import "../utils/helpers.sol";
 
 abstract contract IChallengePool is Helpers {
     enum PoolState {
@@ -53,7 +53,7 @@ abstract contract IChallengePool is Helpers {
     uint256 public joinPeriod = 9000; // in basis point
     uint256 public maxMaturityPeriod = 12 weeks;
     uint256 public maxPlayersPerPool = 100;
-    uint256 public minStakeAmount = 100;
+    uint256 public minStakeAmount = 100 * 1e18;
     uint256 public maxEventsPerChallenge = 10;
     uint256 public minMaturityPeriod = 1 hours;
     uint256 public maxStaleRetries = 3;
@@ -343,8 +343,6 @@ abstract contract IChallengePool is Helpers {
             ) {
                 revert InvalidEventParam();
             }
-            challengeEvent.maturity = _topicEvaluator(challengeEvent.topicId)
-                .actualMaturity(challengeEvent);
             if (
                 challengeEvent.maturity < (block.timestamp + minMaturityPeriod)
             ) {

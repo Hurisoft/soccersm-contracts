@@ -6,19 +6,20 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
+export async function deployTopicRegistry() {
+  const [owner, otherAccount, evaluator] = await ethers.getSigners();
+
+  const TopicRegistry = await ethers.getContractFactory("TopicRegistry");
+  const registry = await TopicRegistry.deploy();
+
+  return { registry, owner, otherAccount, evaluator };
+}
+
 describe("TopicRegistry", function () {
-  async function deployTopicRegistry() {
-    const [owner, otherAccount, evaluator] = await ethers.getSigners();
-
-    const TopicRegistry = await ethers.getContractFactory("TopicRegistry");
-    const registry = await TopicRegistry.deploy();
-
-    return { registry, owner, otherAccount, evaluator };
-  }
-
   async function createTopics() {
-    const { registry, owner, otherAccount, evaluator } =
-      await loadFixture(deployTopicRegistry);
+    const { registry, owner, otherAccount, evaluator } = await loadFixture(
+      deployTopicRegistry
+    );
 
     const title = "Asset Price Above";
     const description =
@@ -40,8 +41,9 @@ describe("TopicRegistry", function () {
       const { registry, owner, otherAccount } = await loadFixture(createTopics);
     });
     it("Should fail with empty title or description", async function () {
-      const { registry, owner, otherAccount, evaluator } =
-        await loadFixture(createTopics);
+      const { registry, owner, otherAccount, evaluator } = await loadFixture(
+        createTopics
+      );
       const emptyTitle = "";
       const emptyDescription = "";
       const title = "Asset Price Above";
@@ -57,8 +59,9 @@ describe("TopicRegistry", function () {
       ).to.revertedWithCustomError(registry, "EmptyString");
     });
     it("Should fail with invalid owner", async function () {
-      const { registry, owner, otherAccount, evaluator } =
-        await loadFixture(deployTopicRegistry);
+      const { registry, owner, otherAccount, evaluator } = await loadFixture(
+        deployTopicRegistry
+      );
 
       const title = "Asset Price Above";
       const description =
@@ -88,8 +91,9 @@ describe("TopicRegistry", function () {
       );
     });
     it("Should fail with invalid owner", async function () {
-      const { registry, owner, otherAccount, evaluator } =
-        await loadFixture(deployTopicRegistry);
+      const { registry, owner, otherAccount, evaluator } = await loadFixture(
+        deployTopicRegistry
+      );
 
       const topicId = 0;
 
@@ -113,13 +117,14 @@ describe("TopicRegistry", function () {
 
       await registry.disableTopic(topicId);
 
-    await expect(
+      await expect(
         registry.enableTopic(topicId + 1)
       ).to.revertedWithCustomError(registry, "InvalidTopic");
     });
     it("Should fail with invalid owner", async function () {
-      const { registry, owner, otherAccount, evaluator } =
-        await loadFixture(createTopics);
+      const { registry, owner, otherAccount, evaluator } = await loadFixture(
+        createTopics
+      );
 
       const topicId = 0;
       await registry.disableTopic(topicId);

@@ -12,6 +12,7 @@
   },
   "scripts": {
     "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
     "gas-test": "REPORT_GAS=true npx hardhat test",
     "deploy_registry": "npx hardhat run ./scripts/deploy_registry.ts",
     "deploy_pool": "npx hardhat run ./scripts/deploy_pool.ts",

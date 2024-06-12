@@ -19,5 +19,5 @@ contract AssetPriceProvider is ITopicDataProvider, DataProviderAccess {
         bytes calldata _params
     ) external override returns (bytes memory _data) {}
 
-    function hasData(bytes calldata _params) external override returns (bool) {}
+    function hasData(bytes calldata _params) external view override returns (bool) {}
 }

@@ -15,11 +15,10 @@ contract FootBallCorrectScore is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        (
-            uint256 matchId,
-            uint256 predictedHomeScore,
-            uint256 predictedAwayScore
-        ) = abi.decode(_challengeEvent.eventParam, (uint256, uint256, uint256));
+        (uint256 matchId, , ) = abi.decode(
+            _challengeEvent.eventParam,
+            (uint256, uint256, uint256)
+        );
 
         bool success = dataProvider().requestData(abi.encode(matchId));
         return success;

@@ -70,10 +70,6 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
         bytes calldata _params
     ) external view override returns (bool) {
         uint256 matchId = abi.decode(_params, (uint256));
-        if (_matchExists(matchId)) {
-            return false;
-        } else {
-            return true;
-        }
+        return (_matchExists(matchId));
     }
 }

@@ -7,5 +7,5 @@ abstract contract ITopicDataProvider {
     function getData(
         bytes calldata _params
     ) external virtual returns (bytes calldata _data);
-    function hasData(bytes calldata _params) external virtual returns (bool);
+    function hasData(bytes calldata _params) external view virtual returns (bool);
 }

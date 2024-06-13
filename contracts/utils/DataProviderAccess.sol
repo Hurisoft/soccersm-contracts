@@ -4,7 +4,7 @@ pragma solidity ^0.8.26;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 abstract contract DataProviderAccess is Ownable {
-  mapping(address => bool) public provider;
+    mapping(address => bool) public provider;
     mapping(address => bool) public reader;
 
     error ProviderOnly();
@@ -40,12 +40,20 @@ abstract contract DataProviderAccess is Ownable {
     }
 
     function addReader(address _reader) external onlyOwner {
-        reader[_reader] = false;
+        reader[_reader] = true;
         emit ReaderAdded(_reader);
     }
 
-    function removeReadder(address _reader) external onlyOwner {
+    function removeReader(address _reader) external onlyOwner {
         reader[_reader] = false;
         emit ReaderRemoved(_reader);
+    }
+
+    function isProvider(address _provider) public view returns (bool) {
+        return provider[_provider];
+    }
+
+    function isReader(address _reader) public view returns (bool) {
+        return reader[_reader];
     }
 }

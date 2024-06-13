@@ -7,9 +7,9 @@ import "../interfaces/IEvaluator.sol";
 
 import "../utils/helpers.sol";
 
-contract AssetPriceBounded is IEvaluator, Helpers {
-    string public constant IN = "in";
-    string public constant OUT = "out";
+contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
+    string public constant ABOVE = "above";
+    string public constant BELOW = "below";
     constructor(
         address _dataProvider
     ) IEvaluator(_dataProvider) Ownable(msg.sender) {}
@@ -17,10 +17,8 @@ contract AssetPriceBounded is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        (string memory assetSymbol, , , ) = abi.decode(
-            _challengeEvent.eventParam,
-            (string, uint256, uint256, string)
-        );
+        (string memory assetSymbol, , ) = abi
+            .decode(_challengeEvent.eventParam, (string, uint256, string));
 
         bool success = dataProvider().requestData(
             abi.encode(assetSymbol, _challengeEvent.maturity)
@@ -31,15 +29,8 @@ contract AssetPriceBounded is IEvaluator, Helpers {
     function decodeAndAnswer(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (IChallengePool.Prediction) {
-        (
-            string memory assetSymbol,
-            uint256 priceLowerBound,
-            uint256 priceUpperBound,
-            string memory outcome
-        ) = abi.decode(
-                _challengeEvent.eventParam,
-                (string, uint256, uint256, string)
-            );
+        (string memory assetSymbol, uint256 price, string memory outcome) = abi
+            .decode(_challengeEvent.eventParam, (string, uint256, string));
         bytes memory encodedAssetSymbol = abi.encode(
             assetSymbol,
             _challengeEvent.maturity
@@ -52,14 +43,12 @@ contract AssetPriceBounded is IEvaluator, Helpers {
             (uint256)
         );
 
-        if (compareStrings(outcome, IN)) {
-            if (
-                assetPrice >= priceLowerBound && assetPrice <= priceUpperBound
-            ) {
+        if (compareStrings(outcome, ABOVE)) {
+            if (assetPrice > price) {
                 return IChallengePool.Prediction.yes;
             }
-        } else if (compareStrings(outcome, OUT)) {
-            if (assetPrice < priceLowerBound || assetPrice > priceUpperBound) {
+        } else if (compareStrings(outcome, BELOW)) {
+            if (assetPrice < price) {
                 return IChallengePool.Prediction.yes;
             }
         } else {

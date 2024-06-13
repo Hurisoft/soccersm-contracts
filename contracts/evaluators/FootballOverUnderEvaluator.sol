@@ -7,7 +7,7 @@ import "../interfaces/IEvaluator.sol";
 
 import "../utils/helpers.sol";
 
-contract FootBallOutcome is IEvaluator, Helpers {
+contract FootballOverUnderEvaluator is IEvaluator, Helpers {
     string public constant OVER = "over";
     string public constant UNDER = "under";
     constructor(

@@ -7,7 +7,7 @@ import "../interfaces/IEvaluator.sol";
 
 import "../utils/helpers.sol";
 
-contract FootBallCorrectScore is IEvaluator, Helpers {
+contract FootBallCorrectScoreEvaluator is IEvaluator, Helpers {
     constructor(
         address _dataProvider
     ) IEvaluator(_dataProvider) Ownable(msg.sender) {}

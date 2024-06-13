@@ -15,7 +15,8 @@ contract AssetPriceProvider is ITopicDataProvider, DataProviderAccess {
     mapping(string => mapping(uint256 => PriceExists)) private _assetDatePrice;
     constructor() Ownable(msg.sender) {}
 
-    error InvalidAssetPrice(string _assetSymbol, uint256 _date);
+    error InvalidAssetSymbolDate(string _assetSymbol, uint256 _date);
+    error InvalidSubmissionDate(uint256 _date);
 
     event AssetPriceRequested(
         address indexed _reader,
@@ -55,7 +56,10 @@ contract AssetPriceProvider is ITopicDataProvider, DataProviderAccess {
             _params,
             (string, uint256, uint256)
         );
-
+        if (block.timestamp < date) {
+            revert InvalidSubmissionDate(date);
+        }
+        _assetDatePrice[assetSymbol][date] = PriceExists(price, true);
         emit AssetPriceProvided(msg.sender, assetSymbol, date, price);
     }
 
@@ -66,8 +70,8 @@ contract AssetPriceProvider is ITopicDataProvider, DataProviderAccess {
             _params,
             (string, uint256)
         );
-        if (_assetPriceExists(assetSymbol, date)) {
-            revert InvalidAssetPrice(assetSymbol, date);
+        if (!_assetPriceExists(assetSymbol, date)) {
+            revert InvalidAssetSymbolDate(assetSymbol, date);
         }
         return abi.encode(_assetDatePrice[assetSymbol][date].price);
     }

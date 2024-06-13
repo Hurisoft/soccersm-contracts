@@ -7,6 +7,8 @@ import "../interfaces/ITopicDataProvider.sol";
 
 import "../utils/DataProviderAccess.sol";
 
+// import "hardhat/console.sol";
+
 contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
     struct MatchScore {
         uint256 matchId;
@@ -60,7 +62,7 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
         bytes calldata _params
     ) external view override returns (bytes memory _data) {
         uint256 matchId = abi.decode(_params, (uint256));
-        if (_matchExists(matchId)) {
+        if (!_matchExists(matchId)) {
             revert InvalidMatchId(matchId);
         }
         return abi.encode(_matchScores[matchId]);

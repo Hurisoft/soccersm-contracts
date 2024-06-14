@@ -10,8 +10,6 @@ export async function deployFootballScoreProvider() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
 
-  // deploy football score provider
-
   const FootballScoreProvider = await ethers.getContractFactory(
     "FootballScoreProvider"
   );
@@ -34,8 +32,6 @@ export async function deployFootballScoreProviderWithKofiProvder() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
 
-  // deploy football score provider
-
   const FootballScoreProvider = await ethers.getContractFactory(
     "FootballScoreProvider"
   );
@@ -57,8 +53,6 @@ export async function deployFootballScoreProviderWithKofiProvder() {
 export async function deployFootballScoreProviderWithKojoReader() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
-
-  // deploy football score provider
 
   const FootballScoreProvider = await ethers.getContractFactory(
     "FootballScoreProvider"
@@ -201,11 +195,10 @@ describe("FootballScoreProvider", function () {
         .withArgs(await kofi.getAddress(), matchId, homeScore, awayScore);
       const matchIdParam = coder.encode(["uint256"], [matchId]);
       const matchData = await provider.getData(matchIdParam);
-      const [_matchId, _homeScore, _awayScore] = coder.decode(
-        ["uint256", "uint256", "uint256"],
+      const [_homeScore, _awayScore] = coder.decode(
+        ["uint256", "uint256"],
         matchData
       );
-      expect(_matchId).to.equals(matchId);
       expect(_homeScore).to.equals(homeScore);
       expect(_awayScore).to.equals(awayScore);
     });
@@ -246,11 +239,10 @@ describe("FootballScoreProvider", function () {
         .withArgs(await kofi.getAddress(), matchId, homeScore, awayScore);
       const matchIdParam = coder.encode(["uint256"], [matchId]);
       const matchData = await provider.getData(matchIdParam);
-      const [_matchId, _homeScore, _awayScore] = coder.decode(
-        ["uint256", "uint256", "uint256"],
+      const [ _homeScore, _awayScore] = coder.decode(
+        ["uint256", "uint256"],
         matchData
       );
-      expect(_matchId).to.equals(matchId);
       expect(_homeScore).to.equals(homeScore);
       expect(_awayScore).to.equals(awayScore);
     });

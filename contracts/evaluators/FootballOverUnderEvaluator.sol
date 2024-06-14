@@ -6,6 +6,7 @@ import "../interfaces/IChallengePool.sol";
 import "../interfaces/IEvaluator.sol";
 
 import "../utils/helpers.sol";
+import "hardhat/console.sol";
 
 contract FootballOverUnderEvaluator is IEvaluator, Helpers {
     string public constant OVER = "over";

@@ -7,8 +7,6 @@ import "../interfaces/ITopicDataProvider.sol";
 
 import "../utils/DataProviderAccess.sol";
 
-// import "hardhat/console.sol";
-
 contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
     struct MatchScore {
         uint256 matchId;
@@ -65,7 +63,11 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
         if (!_matchExists(matchId)) {
             revert InvalidMatchId(matchId);
         }
-        return abi.encode(_matchScores[matchId]);
+        return
+            abi.encode(
+                _matchScores[matchId].homeScore,
+                _matchScores[matchId].awayScore
+            );
     }
 
     function hasData(

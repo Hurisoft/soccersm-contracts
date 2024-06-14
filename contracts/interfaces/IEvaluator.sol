@@ -4,6 +4,7 @@ import "./IChallengePool.sol";
 import "./ITopicDataProvider.sol";
 
 import "../utils/EvaluatorAccess.sol";
+import "hardhat/console.sol";
 
 abstract contract IEvaluator is EvaluatorAccess {
     constructor(address _dataProvider) EvaluatorAccess(_dataProvider) {}
@@ -13,8 +14,10 @@ abstract contract IEvaluator is EvaluatorAccess {
         try this.decodeAndAnswer(_challengeEvent) returns (
             IChallengePool.Prediction k
         ) {
+            console.log("eval", uint8(k));
             return k;
         } catch {
+            console.log("error");
             return IChallengePool.Prediction.zero;
         }
     }
@@ -25,8 +28,10 @@ abstract contract IEvaluator is EvaluatorAccess {
         try this.decodeAndAskProvider(_challengeEvent) returns (
             bool k
         ) {
+            console.log("valid", k);
             return k;
         } catch {
+            console.log("error");
             return false;
         }
     }

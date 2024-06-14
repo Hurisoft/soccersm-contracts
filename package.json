@@ -13,12 +13,8 @@
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
+    "coverage": "npx hardhat coverage",
     "gas-test": "REPORT_GAS=true npx hardhat test",
-    "deploy_registry": "npx hardhat run ./scripts/deploy_registry.ts",
-    "deploy_pool": "npx hardhat run ./scripts/deploy_pool.ts",
-    "deploy_pool_manager": "npx hardhat run ./scripts/deploy_pool_manager.ts",
-    "deploy_symbol_feed": "npx hardhat run ./scripts/deploy_symbol_feed.ts",
-    "deploy_asset_price": "npx hardhat run ./scripts/deploy_asset_price.ts",
     "verify": "npx hardhat verify"
   }
 }

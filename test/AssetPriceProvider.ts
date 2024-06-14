@@ -10,8 +10,6 @@ export async function deployAssetPriceProvider() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
 
-  // deploy football score provider
-
   const AssetPriceProvider = await ethers.getContractFactory(
     "AssetPriceProvider"
   );
@@ -34,8 +32,6 @@ export async function deployAssetPriceProviderWithKofiProvder() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
 
-  // deploy football score provider
-
   const AssetPriceProvider = await ethers.getContractFactory(
     "AssetPriceProvider"
   );
@@ -57,8 +53,6 @@ export async function deployAssetPriceProviderWithKofiProvder() {
 export async function deployAssetPriceProviderWithKojoReader() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
-
-  // deploy football score provider
 
   const AssetPriceProvider = await ethers.getContractFactory(
     "AssetPriceProvider"
@@ -210,6 +204,7 @@ describe("AssetPriceProvider", function () {
       const [_price] = coder.decode(["uint256"], assetData);
 
       expect(BigInt(_price)).to.equals(price);
+      expect(await provider.hasData(assetDateParam)).to.be.true;
     });
     it("Should Fail to Provide Data", async function () {
       const { provider, kofi, kojo } = await loadFixture(
@@ -228,6 +223,14 @@ describe("AssetPriceProvider", function () {
       ).to.revertedWithCustomError(provider, "ProviderOnly");
       const hasParam = coder.encode(["string", "uint256"], [assetSymbol, date]);
       expect(await provider.connect(kojo).hasData(hasParam)).to.be.false;
+      const futureDate = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
+      const futreParam = coder.encode(
+        ["string", "uint256", "uint256"],
+        [assetSymbol, futureDate, price]
+      );
+      await expect(provider.connect(kofi).provideData(futreParam))
+        .to.revertedWithCustomError(provider, "InvalidSubmissionDate")
+        .withArgs(futureDate);
     });
   });
   describe("Get Data", function () {

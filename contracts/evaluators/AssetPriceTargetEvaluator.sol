@@ -7,7 +7,7 @@ import "../interfaces/IEvaluator.sol";
 
 import "../utils/helpers.sol";
 
-contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
+contract AssetPriceTargetEvaluator is IEvaluator, Helpers {
     string public constant ABOVE = "above";
     string public constant BELOW = "below";
     constructor(
@@ -17,8 +17,21 @@ contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        (string memory assetSymbol, , ) = abi
-            .decode(_challengeEvent.eventParam, (string, uint256, string));
+        (
+            string memory assetSymbol,
+            uint256 predictedPrice,
+            string memory outcome
+        ) = abi.decode(_challengeEvent.eventParam, (string, uint256, string));
+
+        if (
+            !compareStrings(outcome, ABOVE) && !compareStrings(outcome, BELOW)
+        ) {
+            return false;
+        }
+
+        if (predictedPrice < 1) {
+            return false;
+        }
 
         bool success = dataProvider().requestData(
             abi.encode(assetSymbol, _challengeEvent.maturity)
@@ -29,8 +42,11 @@ contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
     function decodeAndAnswer(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (IChallengePool.Prediction) {
-        (string memory assetSymbol, uint256 price, string memory outcome) = abi
-            .decode(_challengeEvent.eventParam, (string, uint256, string));
+        (
+            string memory assetSymbol,
+            uint256 predictedPrice,
+            string memory outcome
+        ) = abi.decode(_challengeEvent.eventParam, (string, uint256, string));
         bytes memory encodedAssetSymbol = abi.encode(
             assetSymbol,
             _challengeEvent.maturity
@@ -38,17 +54,17 @@ contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
         if (!dataProvider().hasData(encodedAssetSymbol)) {
             return IChallengePool.Prediction.zero;
         }
-        uint256 assetPrice = abi.decode(
+        uint256 actualPrice = abi.decode(
             dataProvider().getData(encodedAssetSymbol),
             (uint256)
         );
 
         if (compareStrings(outcome, ABOVE)) {
-            if (assetPrice > price) {
+            if (predictedPrice > actualPrice) {
                 return IChallengePool.Prediction.yes;
             }
         } else if (compareStrings(outcome, BELOW)) {
-            if (assetPrice < price) {
+            if (predictedPrice < actualPrice) {
                 return IChallengePool.Prediction.yes;
             }
         } else {

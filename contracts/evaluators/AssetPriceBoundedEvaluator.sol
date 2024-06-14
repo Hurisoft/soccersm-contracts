@@ -17,10 +17,22 @@ contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        (string memory assetSymbol, , , ) = abi.decode(
+        (string memory assetSymbol, uint256 priceLowerBound,
+            uint256 priceUpperBound,
+            string memory outcome) = abi.decode(
             _challengeEvent.eventParam,
             (string, uint256, uint256, string)
         );
+
+        if (
+            !compareStrings(outcome, IN) && !compareStrings(outcome, OUT)
+        ) {
+            return false;
+        }
+
+        if(priceLowerBound >= priceUpperBound) {
+            return false;
+        }
 
         bool success = dataProvider().requestData(
             abi.encode(assetSymbol, _challengeEvent.maturity)

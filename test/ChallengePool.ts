@@ -5,39 +5,83 @@ import {
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { deployTopicRegistry } from "./TopicRegistry";
-import {
-  deployAssetPriceBoundedEvaluator,
-  deployAssetPriceTargetEvaluator,
-  deployFootBallCorrectScoreEvaluator,
-  deployFootballOutcomeEvaluator,
-  deployFootballOverUnderEvaluator,
-} from "./fixtures";
 
 async function deployChallengePool() {
-  const { registry } = await loadFixture(deployTopicRegistry);
 
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
 
-  // deploy evaluators
-  const {
-    evaluator: footBallOutcomeEvaluator,
-    provider: footBallScoreProvider,
-  } = await loadFixture(deployFootballOutcomeEvaluator);
-  const { evaluator: footBallOverUnderEvaluator } = await loadFixture(
-    deployFootballOverUnderEvaluator
+  const TopicRegistry = await ethers.getContractFactory("TopicRegistry");
+  const registry = await TopicRegistry.deploy();
+
+  const FootballScoreProvider = await ethers.getContractFactory(
+    "FootballScoreProvider"
   );
-  const { evaluator: footBallCorrectScoreEvaluator } = await loadFixture(
-    deployFootBallCorrectScoreEvaluator
+  const footBallScoreProvider = await FootballScoreProvider.deploy();
+
+  await footBallScoreProvider.addProvider(owner);
+  console.log(await footBallScoreProvider.getAddress(), "FootballScoreProvider");
+
+  const FootballOutcomeEvaluator = await ethers.getContractFactory(
+    "FootballOutcomeEvaluator"
   );
-  const {
-    evaluator: assetPriceBoundedEvaluator,
-    provider: assetPriceProvider,
-  } = await loadFixture(deployAssetPriceBoundedEvaluator);
-  const { evaluator: assetPriceTargetEvaluator } = await loadFixture(
-    deployAssetPriceTargetEvaluator
+
+  const footBallOutcomeEvaluator = await FootballOutcomeEvaluator.deploy(footBallScoreProvider);
+
+  console.log(await footBallOutcomeEvaluator.getAddress(),"FootballOutcomeEvaluator");
+
+  await footBallScoreProvider.addReader(await footBallOutcomeEvaluator.getAddress());
+
+  const FootballOverUnderEvaluator = await ethers.getContractFactory(
+    "FootballOverUnderEvaluator"
   );
+
+  const footBallOverUnderEvaluator = await FootballOverUnderEvaluator.deploy(footBallScoreProvider);
+  console.log(await footBallOverUnderEvaluator.getAddress(), "FootballOverUnderEvaluator");
+
+  await footBallScoreProvider.addReader(await footBallOverUnderEvaluator.getAddress());
+
+  const FootBallCorrectScoreEvaluator = await ethers.getContractFactory(
+    "FootBallCorrectScoreEvaluator"
+  );
+
+  const footBallCorrectScoreEvaluator = await FootBallCorrectScoreEvaluator.deploy(footBallScoreProvider);
+  console.log(await footBallCorrectScoreEvaluator.getAddress(), "FootBallCorrectScoreEvaluator");
+
+  await footBallScoreProvider.addReader(await footBallCorrectScoreEvaluator.getAddress());
+
+  const AssetPriceProvider = await ethers.getContractFactory(
+    "AssetPriceProvider"
+  );
+  const assetPriceProvider = await AssetPriceProvider.deploy();
+
+  await assetPriceProvider.addProvider(owner);
+  console.log(await assetPriceProvider.getAddress(), "AssetPriceProvider");
+
+  const AssetPriceBoundedEvaluator = await ethers.getContractFactory(
+    "AssetPriceBoundedEvaluator"
+  );
+
+  const assetPriceBoundedEvaluator = await AssetPriceBoundedEvaluator.deploy(assetPriceProvider);
+
+  console.log(await assetPriceBoundedEvaluator.getAddress(), "AssetPriceBoundedEvaluator");
+
+  await assetPriceProvider.addReader(await assetPriceBoundedEvaluator.getAddress());
+
+  const AssetPriceTargetEvaluator = await ethers.getContractFactory(
+    "AssetPriceTargetEvaluator"
+  );
+
+  const assetPriceTargetEvaluator = await AssetPriceTargetEvaluator.deploy(assetPriceProvider);
+
+  console.log( await assetPriceTargetEvaluator.getAddress(), "AssetPriceTargetEvaluator");
+
+  await assetPriceProvider.addReader(await assetPriceTargetEvaluator.getAddress());
+
+  await assetPriceProvider.addProvider(await kofi.getAddress());
+  await footBallScoreProvider.addProvider(await kofi.getAddress());
+
+
   await registry.createTopic(
     "Football Outcome Events",
     "Outcome of football match; home, away, win, home-away, home-draw, away-draw",
@@ -172,7 +216,7 @@ async function deployCreateChallenges() {
   } = await loadFixture(deployChallengePool);
 
   const coder = new ethers.AbiCoder();
-  const matchId = 1;
+  const matchId = 88;
 
   const outcome1 = "home";
   const maturity1 = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
@@ -210,7 +254,7 @@ async function deployCreateChallenges() {
     maturity: maturity3,
   };
 
-  const assetSymbol = "BTC";
+  const assetSymbol = "XRP";
   const date = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
   const outcome4 = "out";
@@ -243,7 +287,7 @@ async function deployCreateChallenges() {
     challengeEvent1,
     challengeEvent2,
     challengeEvent3,
-    // challengeEvent4,
+    challengeEvent4,
     challengeEvent5,
   ];
 
@@ -356,7 +400,7 @@ describe("ChallengePool", function () {
         topicIds,
       } = await loadFixture(deployCreateChallenges);
       const coder = new ethers.AbiCoder();
-      const matchId = 1;
+      const matchId = 99;
 
       const outcome1 = "home";
       const maturity1 = [Math.floor(Date.now() / 1000) + 60 * 60 * 6];
@@ -453,7 +497,7 @@ describe("ChallengePool", function () {
           )
       )
         .to.revertedWithCustomError(pool, "InvalidEventParam")
-        .withArgs(anyValue);
+        .withArgs(anyValue, anyValue);
     });
   });
   describe("Join Challenge", function () {});

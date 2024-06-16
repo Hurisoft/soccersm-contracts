@@ -5,6 +5,7 @@ import {
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { deployFootballScoreProviderWithKojoReader, deployFootballScoreProviderWithKofiProvder } from "./fixtures";
 
 export async function deployFootballScoreProvider() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
@@ -16,6 +17,7 @@ export async function deployFootballScoreProvider() {
   const provider = await FootballScoreProvider.deploy();
 
   await provider.addProvider(owner);
+  console.log(await provider.getAddress(), "FootballScoreProvider");
 
   return {
     owner,
@@ -28,49 +30,7 @@ export async function deployFootballScoreProvider() {
   };
 }
 
-export async function deployFootballScoreProviderWithKofiProvder() {
-  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
-    await ethers.getSigners();
 
-  const FootballScoreProvider = await ethers.getContractFactory(
-    "FootballScoreProvider"
-  );
-  const provider = await FootballScoreProvider.deploy();
-
-  await provider.addProvider(kofi);
-
-  return {
-    owner,
-    feeAccount,
-    otherAccount,
-    kojo,
-    kwame,
-    kofi,
-    provider,
-  };
-}
-
-export async function deployFootballScoreProviderWithKojoReader() {
-  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
-    await ethers.getSigners();
-
-  const FootballScoreProvider = await ethers.getContractFactory(
-    "FootballScoreProvider"
-  );
-  const provider = await FootballScoreProvider.deploy();
-
-  await provider.addReader(kojo);
-
-  return {
-    owner,
-    feeAccount,
-    otherAccount,
-    kojo,
-    kwame,
-    kofi,
-    provider,
-  };
-}
 
 describe("FootballScoreProvider", function () {
   describe("Deployment", function () {

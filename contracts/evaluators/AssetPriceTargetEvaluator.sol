@@ -17,6 +17,7 @@ contract AssetPriceTargetEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
+        console.log("AssetPriceTargetEvaluator");
         (
             string memory assetSymbol,
             uint256 predictedPrice,

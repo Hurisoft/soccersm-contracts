@@ -15,6 +15,7 @@ contract FootBallCorrectScoreEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
+        console.log("FootBallCorrectScoreEvaluator");
         (uint256 matchId, , ) = abi.decode(
             _challengeEvent.eventParam,
             (uint256, uint256, uint256)

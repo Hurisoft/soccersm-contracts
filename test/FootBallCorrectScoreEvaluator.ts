@@ -5,36 +5,9 @@ import {
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { deployFootballScoreProviderWithKofiProvder } from "./FootballScoreProvider";
+import { deployFootBallCorrectScoreEvaluator } from "./fixtures";
 
-export async function deployFootBallCorrectScoreEvaluator() {
-  const { provider, kofi } = await loadFixture(
-    deployFootballScoreProviderWithKofiProvder
-  );
 
-  const [owner, feeAccount, otherAccount, kojo, kwame] =
-    await ethers.getSigners();
-
-  // deploy football evaluator
-  const FootBallCorrectScoreEvaluator = await ethers.getContractFactory(
-    "FootBallCorrectScoreEvaluator"
-  );
-
-  const evaluator = await FootBallCorrectScoreEvaluator.deploy(provider);
-
-  await provider.addReader(await evaluator.getAddress());
-
-  return {
-    owner,
-    feeAccount,
-    otherAccount,
-    kojo,
-    kwame,
-    kofi,
-    evaluator,
-    provider,
-  };
-}
 
 describe("FootBallCorrectScoreEvaluator", function () {
   describe("Deployment", function () {

@@ -17,7 +17,7 @@ abstract contract IEvaluator is EvaluatorAccess {
             console.log("eval", uint8(k));
             return k;
         } catch {
-            console.log("error");
+            console.log("error", _challengeEvent.topicId);
             return IChallengePool.Prediction.zero;
         }
     }
@@ -31,7 +31,7 @@ abstract contract IEvaluator is EvaluatorAccess {
             console.log("valid", k);
             return k;
         } catch {
-            console.log("error");
+            console.log("error", _challengeEvent.topicId);
             return false;
         }
     }

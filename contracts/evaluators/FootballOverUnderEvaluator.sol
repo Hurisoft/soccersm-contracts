@@ -18,6 +18,7 @@ contract FootballOverUnderEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
+        console.log("FootballOverUnderEvaluator");
         (uint256 matchId, uint256 predictedTotal, string memory outcome) = abi
             .decode(_challengeEvent.eventParam, (uint256, uint256, string));
         if (!compareStrings(outcome, OVER) && !compareStrings(outcome, UNDER)) {

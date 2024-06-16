@@ -18,6 +18,7 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
 
     error InvalidMatchId(uint256 _matchId);
     error ZeroMatchIdNotAllowed();
+    error DataAlreadyProvided();
 
     event FootballScoreRequested(address indexed _reader, uint256 _matchId);
     event FootballScoreProvided(
@@ -51,6 +52,9 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
         );
         if (matchId == 0) {
             revert ZeroMatchIdNotAllowed();
+        }
+        if (_matchExists(matchId)) {
+            revert DataAlreadyProvided();
         }
         _matchScores[matchId] = MatchScore(matchId, homeScore, awayScore);
         emit FootballScoreProvided(msg.sender, matchId, homeScore, awayScore);

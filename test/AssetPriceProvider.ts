@@ -5,6 +5,7 @@ import {
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { deployAssetPriceProviderWithKojoReader, deployAssetPriceProviderWithKofiProvder } from "./fixtures";
 
 export async function deployAssetPriceProvider() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
@@ -16,6 +17,7 @@ export async function deployAssetPriceProvider() {
   const provider = await AssetPriceProvider.deploy();
 
   await provider.addProvider(owner);
+  console.log(await provider.getAddress(), "AssetPriceProvider");
 
   return {
     owner,
@@ -28,49 +30,6 @@ export async function deployAssetPriceProvider() {
   };
 }
 
-export async function deployAssetPriceProviderWithKofiProvder() {
-  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
-    await ethers.getSigners();
-
-  const AssetPriceProvider = await ethers.getContractFactory(
-    "AssetPriceProvider"
-  );
-  const provider = await AssetPriceProvider.deploy();
-
-  await provider.addProvider(kofi);
-
-  return {
-    owner,
-    feeAccount,
-    otherAccount,
-    kojo,
-    kwame,
-    kofi,
-    provider,
-  };
-}
-
-export async function deployAssetPriceProviderWithKojoReader() {
-  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
-    await ethers.getSigners();
-
-  const AssetPriceProvider = await ethers.getContractFactory(
-    "AssetPriceProvider"
-  );
-  const provider = await AssetPriceProvider.deploy();
-
-  await provider.addReader(kojo);
-
-  return {
-    owner,
-    feeAccount,
-    otherAccount,
-    kojo,
-    kwame,
-    kofi,
-    provider,
-  };
-}
 
 describe("AssetPriceProvider", function () {
   describe("Deployment", function () {

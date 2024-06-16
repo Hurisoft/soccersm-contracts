@@ -21,6 +21,7 @@ contract FootballOutcomeEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
+        console.log("FootballOutcomeEvaluator");
         (uint256 matchId, string memory outcome) = abi.decode(
             _challengeEvent.eventParam,
             (uint256, string)

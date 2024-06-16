@@ -1,210 +1,464 @@
-// import {
-//   time,
-//   loadFixture,
-// } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-// import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-// import { expect } from "chai";
-// import { ethers } from "hardhat";
-// import { deployTopicRegistry } from "./TopicRegistry";
-// import {
-//   ChallengePool,
-//   DummyEvaluator,
-//   TestBalls,
-//   TopicRegistry,
-// } from "../typechain-types";
+import {
+  time,
+  loadFixture,
+} from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { deployTopicRegistry } from "./TopicRegistry";
+import {
+  deployAssetPriceBoundedEvaluator,
+  deployAssetPriceTargetEvaluator,
+  deployFootBallCorrectScoreEvaluator,
+  deployFootballOutcomeEvaluator,
+  deployFootballOverUnderEvaluator,
+} from "./fixtures";
 
-// async function deployChallengePool() {
-//   const { registry } = await loadFixture(deployTopicRegistry);
+async function deployChallengePool() {
+  const { registry } = await loadFixture(deployTopicRegistry);
 
-//   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
-//     await ethers.getSigners();
+  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
+    await ethers.getSigners();
 
-//   // deploy dummy evaluator
-//   const DummyEvaluator = await ethers.getContractFactory("DummyEvaluator");
-//   const dummyYesEvaluator = await DummyEvaluator.deploy(true, 1);
-//   const dummyNoEvaluator = await DummyEvaluator.deploy(true, 2);
-//   const dummyZeroEvaluator = await DummyEvaluator.deploy(true, 0);
-//   const dummyFalsValidate = await DummyEvaluator.deploy(false, 1);
-//   await createTopic(
-//     registry,
-//     dummyYesEvaluator,
-//     "dummyYesEvaluator",
-//     "Always Yes"
-//   ); // id 0
-//   await createTopic(
-//     registry,
-//     dummyNoEvaluator,
-//     "dummyNoEvaluator",
-//     "Always No"
-//   ); // id 1
-//   await createTopic(
-//     registry,
-//     dummyZeroEvaluator,
-//     "dummyZeroEvaluator",
-//     "Always Zero"
-//   ); // 2
-//   await createTopic(
-//     registry,
-//     dummyFalsValidate,
-//     "dummyFalsValidate",
-//     "Validate False"
-//   ); // 3
-//   // deploy test trophies
-//   const TestTrophies = await ethers.getContractFactory("TestTrophies");
-//   const testTrophies = await TestTrophies.deploy();
-//   // deploy test balls
-//   const TestBalls = await ethers.getContractFactory("TestBalls");
-//   const testBalls = await TestBalls.deploy();
+  // deploy evaluators
+  const {
+    evaluator: footBallOutcomeEvaluator,
+    provider: footBallScoreProvider,
+  } = await loadFixture(deployFootballOutcomeEvaluator);
+  const { evaluator: footBallOverUnderEvaluator } = await loadFixture(
+    deployFootballOverUnderEvaluator
+  );
+  const { evaluator: footBallCorrectScoreEvaluator } = await loadFixture(
+    deployFootBallCorrectScoreEvaluator
+  );
+  const {
+    evaluator: assetPriceBoundedEvaluator,
+    provider: assetPriceProvider,
+  } = await loadFixture(deployAssetPriceBoundedEvaluator);
+  const { evaluator: assetPriceTargetEvaluator } = await loadFixture(
+    deployAssetPriceTargetEvaluator
+  );
+  await registry.createTopic(
+    "Football Outcome Events",
+    "Outcome of football match; home, away, win, home-away, home-draw, away-draw",
+    await footBallOutcomeEvaluator.getAddress()
+  ); // id 0
+  await registry.createTopic(
+    "Football Over/Under Events",
+    "Whether total goals will be over or under a given value. Values are 1.5, 2.5, 3.5 and 4.5",
+    await footBallOverUnderEvaluator.getAddress()
+  ); // id 1
+  await registry.createTopic(
+    "Football Correct Score Events",
+    "The correct score of a football match",
+    await footBallCorrectScoreEvaluator.getAddress()
+  ); // 2
+  await registry.createTopic(
+    "Asset Price Bounded",
+    "Whether asset price will fall within a given bound",
+    await assetPriceBoundedEvaluator.getAddress()
+  ); // 3
+  await registry.createTopic(
+    "Asset Price Target",
+    "Whether asset price be above or below a given amount",
+    await assetPriceTargetEvaluator.getAddress()
+  ); // 4
+  console.log(
+    await assetPriceBoundedEvaluator.getAddress(),
+    "assetPriceBoundedEvaluator\n",
+    await assetPriceTargetEvaluator.getAddress(),
+    "assetPriceTargetEvaluator\n",
+    await footBallCorrectScoreEvaluator.getAddress(),
+    "footBallCorrectScoreEvaluator\n",
+    await footBallOverUnderEvaluator.getAddress(),
+    "footBallOverUnderEvaluator\n",
+    await footBallOutcomeEvaluator.getAddress(),
+    "footBallOutcomeEvaluator\n",
+  );
 
-//   const ONE_HOUR = 60 * 60;
-//   const ONE_DAY = ONE_HOUR * 24;
-//   const ONE_WEEK = ONE_DAY * 7;
+  const topicIds = {
+    outcome: 0,
+    overUnder: 1,
+    correctScore: 2,
+    boundedPrice: 3,
+    targetPrice: 4,
+  };
+  // deploy test trophies
+  const TestTrophies = await ethers.getContractFactory("TestTrophies");
+  const testTrophies = await TestTrophies.deploy();
+  // deploy test balls
+  const TestBalls = await ethers.getContractFactory("TestBalls");
+  const testBalls = await TestBalls.deploy();
 
-//   const poolFee = 10;
-//   const joinPeriod = 9000;
-//   const maxMaturityPeriod = ONE_WEEK * 12;
-//   const maxPlayersPerPool = 100;
-//   const minStakeAmount = BigInt(100 * 1e18);
-//   const maxEventsPerChallenge = 10;
-//   const minMaturityPeriod = ONE_HOUR;
-//   const maxStaleRetries = 3;
-//   const staleExtensionPeriod = ONE_HOUR;
-//   const feeAddress = feeAccount;
-//   const balls = testBalls;
-//   const trophies = testTrophies;
-//   const topicRegistry = registry;
+  const ONE_HOUR = 60 * 60;
+  const ONE_DAY = ONE_HOUR * 24;
+  const ONE_WEEK = ONE_DAY * 7;
 
-//   // deploy challenge
+  const poolFee = 10;
+  const joinPeriod = 9000;
+  const maxMaturityPeriod = ONE_WEEK * 12;
+  const maxPlayersPerPool = 100;
+  const minStakeAmount = BigInt(100 * 1e18);
+  const maxEventsPerChallenge = 10;
+  const minMaturityPeriod = ONE_HOUR;
+  const maxStaleRetries = 3;
+  const staleExtensionPeriod = ONE_HOUR;
+  const feeAddress = feeAccount;
+  const balls = testBalls;
+  const trophies = testTrophies;
+  const topicRegistry = registry;
 
-//   const ChallengePool = await ethers.getContractFactory("ChallengePool");
-//   const pool = await ChallengePool.deploy(
-//     poolFee,
-//     joinPeriod,
-//     maxMaturityPeriod,
-//     maxPlayersPerPool,
-//     minStakeAmount,
-//     maxEventsPerChallenge,
-//     minMaturityPeriod,
-//     maxStaleRetries,
-//     staleExtensionPeriod,
-//     feeAddress,
-//     topicRegistry,
-//     trophies,
-//     balls
-//   );
+  // deploy challenge
 
-//   return {
-//     registry,
-//     owner,
-//     feeAccount,
-//     otherAccount,
-//     kojo,
-//     kwame,
-//     kofi,
-//     dummyYesEvaluator,
-//     dummyNoEvaluator,
-//     dummyZeroEvaluator,
-//     testTrophies,
-//     testBalls,
-//     pool,
-//   };
-// }
+  const ChallengePool = await ethers.getContractFactory("ChallengePool");
+  const pool = await ChallengePool.deploy(
+    poolFee,
+    joinPeriod,
+    maxMaturityPeriod,
+    maxPlayersPerPool,
+    minStakeAmount,
+    maxEventsPerChallenge,
+    minMaturityPeriod,
+    maxStaleRetries,
+    staleExtensionPeriod,
+    feeAddress,
+    topicRegistry,
+    trophies,
+    balls
+  );
 
-// async function createTopic(
-//   registry: TopicRegistry,
-//   dummyEvaluator: DummyEvaluator,
-//   title: string,
-//   description: string
-// ) {
-//   await registry.createTopic(title, description, dummyEvaluator);
-// }
+  return {
+    registry,
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    assetPriceProvider,
+    footBallOutcomeEvaluator,
+    footBallOverUnderEvaluator,
+    footBallScoreProvider,
+    footBallCorrectScoreEvaluator,
+    assetPriceBoundedEvaluator,
+    assetPriceTargetEvaluator,
+    testTrophies,
+    testBalls,
+    pool,
+    topicIds,
+  };
+}
 
-// async function createYesChallenge(pool: ChallengePool, balls: TestBalls) {
-//   const topicId = 0;
-//   const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
-//   const matchAId = 1;
-//   const matchBId = 2;
-//   const matchCId = 3;
-//   const outcomeA = "home";
-//   const outcomeB = "draw";
-//   const outcomeC = "away";
-//   const encoder = new ethers.AbiCoder();
-//   const event1 = encoder.encode(["uint256", "string"], [matchAId, outcomeA]);
-//   const event2 = encoder.encode(["uint256", "string"], [matchBId, outcomeB]);
-//   const event3 = encoder.encode(["uint256", "uint256"], [matchCId, 1]);
+async function deployCreateChallenges() {
+  const {
+    registry,
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    assetPriceProvider,
+    footBallOutcomeEvaluator,
+    footBallOverUnderEvaluator,
+    footBallScoreProvider,
+    footBallCorrectScoreEvaluator,
+    assetPriceBoundedEvaluator,
+    assetPriceTargetEvaluator,
+    testTrophies,
+    testBalls,
+    pool,
+    topicIds,
+  } = await loadFixture(deployChallengePool);
 
-//   const stake = BigInt(200 * 1e18);
-//   const prediction = 1;
+  const coder = new ethers.AbiCoder();
+  const matchId = 1;
 
-//   const feeAndStake = await pool.stakeAmountAndFee(stake);
+  const outcome1 = "home";
+  const maturity1 = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
+  const eventParam1 = coder.encode(["uint256", "string"], [matchId, outcome1]);
+  const challengeEvent1 = {
+    eventParam: eventParam1,
+    topicId: topicIds.outcome,
+    maturity: maturity1,
+  };
 
-//   await balls.approve(await pool.getAddress(), feeAndStake[0] + feeAndStake[1]);
+  const predictedTotal = 4;
+  const outcome2 = "under";
+  const maturity2 = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
+  const eventParam2 = coder.encode(
+    ["uint256", "uint256", "string"],
+    [matchId, predictedTotal, outcome2]
+  );
+  const challengeEvent2 = {
+    eventParam: eventParam2,
+    topicId: topicIds.overUnder,
+    maturity: maturity2,
+  };
 
-//   await pool.createChallenge(
-//     [event1, event2, event3],
-//     [maturity, maturity, maturity],
-//     [topicId, topicId, topicId],
-//     prediction,
-//     stake
-//   );
-// }
+  const predictedHomeScore = 3;
+  const predictedAwayScore = 2;
 
-// async function createNoChallenge(pool: ChallengePool) {}
+  const maturity3 = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
+  const eventParam3 = coder.encode(
+    ["uint256", "uint256", "uint256"],
+    [matchId, predictedHomeScore, predictedAwayScore]
+  );
+  const challengeEvent3 = {
+    eventParam: eventParam3,
+    topicId: topicIds.correctScore,
+    maturity: maturity3,
+  };
 
-// async function createZeroChallenge(pool: ChallengePool) {}
+  const assetSymbol = "BTC";
+  const date = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
-// async function createChallenges() {
-//   const {
-//     registry,
-//     owner,
-//     feeAccount,
-//     otherAccount,
-//     kojo,
-//     kwame,
-//     kofi,
-//     dummyYesEvaluator,
-//     dummyNoEvaluator,
-//     dummyZeroEvaluator,
-//     testTrophies,
-//     testBalls,
-//     pool,
-//   } = await loadFixture(deployChallengePool);
+  const outcome4 = "out";
+  const priceLowerBound = BigInt(60000);
+  const priceUpperBound = BigInt(100000);
+  const eventParam4 = coder.encode(
+    ["string", "uint256", "uint256", "string"],
+    [assetSymbol, priceLowerBound, priceUpperBound, outcome4]
+  );
 
-//   await createYesChallenge(pool, testBalls);
-//   //   await createNoChallenge(pool);
-//   //   await createZeroChallenge(pool);
+  const challengeEvent4 = {
+    eventParam: eventParam4,
+    topicId: topicIds.boundedPrice,
+    maturity: date,
+  };
 
-//   return {
-//     registry,
-//     owner,
-//     feeAccount,
-//     otherAccount,
-//     kojo,
-//     kwame,
-//     kofi,
-//     dummyYesEvaluator,
-//     dummyNoEvaluator,
-//     dummyZeroEvaluator,
-//     testTrophies,
-//     testBalls,
-//     pool,
-//   };
-// }
+  const outcome = "above";
+  const predictedPrice = BigInt(1000);
+  const eventParam5 = coder.encode(
+    ["string", "uint256", "string"],
+    [assetSymbol, predictedPrice, outcome]
+  );
+  const challengeEvent5 = {
+    eventParam: eventParam5,
+    topicId: topicIds.targetPrice,
+    maturity: date,
+  };
 
-// describe("ChallengePool", function () {
-//   describe("Deployment", function () {
-//     it("Should Deploy Pool", async function () {
-//       await loadFixture(deployChallengePool);
-//     });
-//   });
-//   describe("Create Challenge", function () {
-//     it("Should Create Challenge", async function () {
-//       await loadFixture(createChallenges);
-//     });
-//   });
-//   describe("Join Challenge", function () {});
-//   describe("Close Challenge", function () {});
-//   describe("Withdraw Winnings", function () {});
-//   describe("Batch Close Challenge", function () {});
-//   describe("Batch Withdraw Winnings", function () {});
-// });
+  const challenges = [
+    challengeEvent1,
+    challengeEvent2,
+    challengeEvent3,
+    // challengeEvent4,
+    challengeEvent5,
+  ];
+
+  const _eventsParams = [];
+  const _eventsMaturity = [];
+  const _eventsTopics = [];
+
+  for (const ch of challenges) {
+    _eventsParams.push(ch.eventParam);
+    _eventsMaturity.push(ch.maturity);
+    _eventsTopics.push(ch.topicId);
+  }
+
+  const stake = BigInt(1000 * 1e18); // balls
+  const stkFee = await pool.stakeAmountAndFee(stake);
+  const prediction = 1; // yes
+
+  const airDropBalls = BigInt(10000 * 1e18);
+
+  await testBalls.transfer(otherAccount, airDropBalls);
+
+  await testBalls.connect(otherAccount).approve(pool, stkFee);
+
+  await pool
+    .connect(otherAccount)
+    .createChallenge(
+      _eventsParams,
+      _eventsMaturity,
+      _eventsTopics,
+      prediction,
+      stake
+    ); // creates challenge 0
+
+  const kwamePrediction = 2;
+
+  await testBalls.transfer(kwame, airDropBalls);
+
+  await testBalls.connect(kwame).approve(pool, stkFee);
+
+  await pool.connect(kwame).joinChallenge(0, kwamePrediction, stake);
+
+  await time.increase(60 * 60 * 3);
+
+  const homeScore = 3;
+  const awayScore = 2;
+  const param1 = coder.encode(
+    ["uint256", "uint256", "uint256"],
+    [matchId, homeScore, awayScore]
+  );
+
+  await footBallScoreProvider.connect(kofi).provideData(param1);
+
+  const price = BigInt(70000);
+  const param2 = coder.encode(
+    ["string", "uint256", "uint256"],
+    [assetSymbol, date, price]
+  );
+  await assetPriceProvider.connect(kofi).provideData(param2);
+  return {
+    registry,
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    assetPriceProvider,
+    footBallOutcomeEvaluator,
+    footBallOverUnderEvaluator,
+    footBallScoreProvider,
+    footBallCorrectScoreEvaluator,
+    assetPriceBoundedEvaluator,
+    assetPriceTargetEvaluator,
+    testTrophies,
+    testBalls,
+    pool,
+    topicIds,
+  };
+}
+
+describe("ChallengePool", function () {
+  describe("Deployment", function () {
+    it("Should Deploy Pool", async function () {
+      await loadFixture(deployChallengePool);
+    });
+  });
+  describe("Create Challenge", function () {
+    it("Should Create Challenge", async function () {
+      await loadFixture(deployCreateChallenges);
+    });
+    it("Should Fail to Create Challenge", async function () {
+      const {
+        registry,
+        owner,
+        feeAccount,
+        otherAccount,
+        kojo,
+        kwame,
+        kofi,
+        assetPriceProvider,
+        footBallOutcomeEvaluator,
+        footBallOverUnderEvaluator,
+        footBallScoreProvider,
+        footBallCorrectScoreEvaluator,
+        assetPriceBoundedEvaluator,
+        assetPriceTargetEvaluator,
+        testTrophies,
+        testBalls,
+        pool,
+        topicIds,
+      } = await loadFixture(deployCreateChallenges);
+      const coder = new ethers.AbiCoder();
+      const matchId = 1;
+
+      const outcome1 = "home";
+      const maturity1 = [Math.floor(Date.now() / 1000) + 60 * 60 * 6];
+      const eventParam1 = [
+        coder.encode(["uint256", "string"], [matchId, outcome1]),
+      ];
+      const topicId1 = [topicIds.outcome];
+      await expect(
+        pool
+          .connect(otherAccount)
+          .createChallenge(
+            eventParam1,
+            maturity1,
+            topicId1,
+            1,
+            BigInt(10000 * 1e18)
+          )
+      ).to.revertedWithCustomError(pool, "UserLacksEnoughBalls");
+      await expect(
+        pool
+          .connect(otherAccount)
+          .createChallenge(
+            eventParam1,
+            maturity1,
+            topicId1,
+            0,
+            BigInt(10000 * 1e18)
+          )
+      ).to.revertedWithCustomError(pool, "InvalidPrediction");
+      const eventParam2 = Array.from({ length: 11 }, (_, i) => eventParam1[0]);
+      const maturity2 = Array.from({ length: 11 }, (_, i) => maturity1[0]);
+      const topicId2 = Array.from({ length: 11 }, (_, i) => topicId1[0]);
+
+      await expect(
+        pool
+          .connect(otherAccount)
+          .createChallenge(
+            eventParam2,
+            maturity2,
+            topicId2,
+            1,
+            BigInt(10000 * 1e18)
+          )
+      ).to.revertedWithCustomError(pool, "InvalidEventsLength");
+
+      const eventParam3 = Array.from({ length: 10 }, (_, i) => eventParam1[0]);
+      const maturity3 = Array.from({ length: 9 }, (_, i) => maturity1[0]);
+      const topicId3 = Array.from({ length: 10 }, (_, i) => topicId1[0]);
+
+      await expect(
+        pool
+          .connect(otherAccount)
+          .createChallenge(
+            eventParam3,
+            maturity3,
+            topicId3,
+            1,
+            BigInt(10000 * 1e18)
+          )
+      )
+        .to.revertedWithCustomError(pool, "InvalidLengthForEvent")
+        .withArgs(eventParam3.length, maturity3.length, topicId3.length);
+      await expect(
+        pool
+          .connect(otherAccount)
+          .createChallenge(eventParam1, maturity1, [9], 1, BigInt(1000 * 1e18))
+      ).to.revertedWithCustomError(pool, "InvalidEventTopic");
+      const maturity4 = [Math.floor(Date.now() / 1000) + 60 * 60 * 4];
+      await expect(
+        pool
+          .connect(otherAccount)
+          .createChallenge(
+            eventParam1,
+            maturity4,
+            topicId1,
+            1,
+            BigInt(1000 * 1e18)
+          )
+      )
+        .to.revertedWithCustomError(pool, "InvalidEventMaturity")
+        .withArgs(anyValue);
+      const eventParam4 = [
+        coder.encode(["uint256", "string"], [matchId, "outcome1"]),
+      ];
+      await expect(
+        pool
+          .connect(otherAccount)
+          .createChallenge(
+            eventParam4,
+            maturity1,
+            topicId1,
+            1,
+            BigInt(1000 * 1e18)
+          )
+      )
+        .to.revertedWithCustomError(pool, "InvalidEventParam")
+        .withArgs(anyValue);
+    });
+  });
+  describe("Join Challenge", function () {});
+  describe("Close Challenge", function () {});
+  describe("Withdraw Winnings", function () {});
+  describe("Batch Close Challenge", function () {});
+  describe("Batch Withdraw Winnings", function () {});
+});

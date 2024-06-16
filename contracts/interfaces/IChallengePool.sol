@@ -58,6 +58,7 @@ abstract contract IChallengePool is Helpers {
     uint256 public minMaturityPeriod = 1 hours;
     uint256 public maxStaleRetries = 3;
     uint256 public staleExtensionPeriod = 1 hours;
+    uint256 public accumulatedFee = 0;
     address public feeAddress;
     ITopicRegistry public topicRegistry;
     IERC20 public trophies;
@@ -141,8 +142,8 @@ abstract contract IChallengePool is Helpers {
         uint256 _topics
     );
     error InvalidEventTopic();
-    error InvalidEventParam();
-    error InvalidEventMaturity();
+    error InvalidEventParam(uint256 _eventPosition, address _evaluator);
+    error InvalidEventMaturity(uint256 _timeDiff);
     error InvalidEventsLength();
 
     modifier validChallenge(uint256 _challengeId) {
@@ -341,12 +342,18 @@ abstract contract IChallengePool is Helpers {
                     challengeEvent
                 )
             ) {
-                revert InvalidEventParam();
+                revert InvalidEventParam(
+                    i,
+                    address(_topicEvaluator(challengeEvent.topicId))
+                );
             }
             if (
                 challengeEvent.maturity < (block.timestamp + minMaturityPeriod)
             ) {
-                revert InvalidEventMaturity();
+                revert InvalidEventMaturity(
+                    (block.timestamp + minMaturityPeriod) -
+                        challengeEvent.maturity
+                );
             }
 
             if (minMatureDate == 0) {
@@ -366,6 +373,7 @@ abstract contract IChallengePool is Helpers {
             }
             events[i] = challengeEvent;
         }
+        accumulatedFee += fee;
         _deposit(_stake + fee);
         uint256 yesParticipants = _userPrediction == Prediction.yes ? 1 : 0;
         uint256 noParticipants = _userPrediction == Prediction.no ? 1 : 0;
@@ -426,6 +434,7 @@ abstract contract IChallengePool is Helpers {
         } else {
             challenge.noParticipants += 1;
         }
+        accumulatedFee += fee;
         _deposit(_stake + fee);
         emit JoinChallengePool(
             _challengeId,
@@ -600,10 +609,8 @@ abstract contract IChallengePool is Helpers {
         }
     }
 
-    function stakeAmountAndFee(
-        uint256 _stake
-    ) public view returns (uint256, uint256) {
-        return (_stake, _computeFee(_stake));
+    function stakeAmountAndFee(uint256 _stake) public view returns (uint256) {
+        return _stake + _computeFee(_stake);
     }
 
     function challengeDeadline(

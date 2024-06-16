@@ -61,11 +61,11 @@ contract AssetPriceTargetEvaluator is IEvaluator, Helpers {
         );
 
         if (compareStrings(outcome, ABOVE)) {
-            if (predictedPrice > actualPrice) {
+            if (actualPrice > predictedPrice) {
                 return IChallengePool.Prediction.yes;
             }
         } else if (compareStrings(outcome, BELOW)) {
-            if (predictedPrice < actualPrice) {
+            if (actualPrice < predictedPrice) {
                 return IChallengePool.Prediction.yes;
             }
         } else {

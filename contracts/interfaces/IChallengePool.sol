@@ -87,7 +87,8 @@ abstract contract IChallengePool is Helpers {
     event ClosedChallengePool(
         uint256 indexed challengeId,
         address indexed closer,
-        PoolState state
+        PoolState state,
+        Prediction result
     );
     event CancelChallengePool(
         uint256 indexed challengeId,
@@ -134,7 +135,7 @@ abstract contract IChallengePool is Helpers {
     error PlayerWinningAlreadyWithdrawn();
     error StakeLowerThanMinimum();
     error ProtocolInvariantCheckFailed();
-    error NextStalePoolRetryNotReached();
+    error NextStalePoolRetryNotReached(uint256 _curentRetry);
     error UserLacksBalls();
     error InvalidLengthForEvent(
         uint256 _params,
@@ -373,6 +374,7 @@ abstract contract IChallengePool is Helpers {
             }
             events[i] = challengeEvent;
         }
+        userChallengePrediction[msg.sender][challengeId] = _userPrediction;
         accumulatedFee += fee;
         _deposit(_stake + fee);
         uint256 yesParticipants = _userPrediction == Prediction.yes ? 1 : 0;
@@ -458,8 +460,8 @@ abstract contract IChallengePool is Helpers {
             revert ActionNotAllowedForState(currentState);
         }
         if (currentState == PoolState.stale) {
-            if (challenge.nextCloseTime < block.timestamp) {
-                revert NextStalePoolRetryNotReached();
+            if (challenge.nextCloseTime > block.timestamp) {
+                revert NextStalePoolRetryNotReached(challenge.staleRetries);
             }
             if (challenge.staleRetries >= maxStaleRetries) {
                 challenge.state = PoolState.manual;
@@ -503,7 +505,12 @@ abstract contract IChallengePool is Helpers {
         }
         challenge.result = result ? Prediction.yes : Prediction.no;
         challenge.state = PoolState.closed;
-        emit ClosedChallengePool(_challengeId, msg.sender, challenge.state);
+        emit ClosedChallengePool(
+            _challengeId,
+            msg.sender,
+            challenge.state,
+            challenge.result
+        );
     }
 
     function batchCloseChallenge(uint256[] memory _challengeIds) external {
@@ -512,7 +519,9 @@ abstract contract IChallengePool is Helpers {
         }
     }
 
-    function withdrawWinnings(uint256 _challengeId) public {
+    function withdrawWinnings(
+        uint256 _challengeId
+    ) public validChallenge(_challengeId) {
         (uint256 totalWithdrawal, uint256 winShare) = checkWinnings(
             _challengeId
         );

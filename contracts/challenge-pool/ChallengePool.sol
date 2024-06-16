@@ -37,7 +37,9 @@ contract ChallengePool is IChallengePool, Ownable {
         trophies = IERC20(_trophiesAddress);
         topicRegistry = ITopicRegistry(_topicRegistry);
     }
-    function setFeeAddress(address _feeAddress) external override onlyOwner {
+    function setFeeAddress(
+        address _feeAddress
+    ) external override onlyOwner positiveAddress(_feeAddress) {
         feeAddress = _feeAddress;
     }
 
@@ -75,19 +77,19 @@ contract ChallengePool is IChallengePool, Ownable {
 
     function setTopicRegistry(
         address _topicRegistry
-    ) external override onlyOwner {
+    ) external override onlyOwner positiveAddress(_topicRegistry) {
         topicRegistry = ITopicRegistry(_topicRegistry);
     }
 
     function setTrophiesAddress(
         address _trophiesAddress
-    ) external override onlyOwner {
+    ) external override onlyOwner positiveAddress(_trophiesAddress) {
         trophies = IERC20(_trophiesAddress);
     }
 
     function setBallsAddress(
         address _ballsAddress
-    ) external override onlyOwner {
+    ) external override onlyOwner positiveAddress(_ballsAddress) {
         balls = IERC20(_ballsAddress);
     }
 
@@ -126,7 +128,12 @@ contract ChallengePool is IChallengePool, Ownable {
         }
         challenge.result = _manualResult;
         challenge.state = PoolState.manual;
-        emit ClosedChallengePool(_challengeId, msg.sender, challenge.state);
+        emit ClosedChallengePool(
+            _challengeId,
+            msg.sender,
+            challenge.state,
+            challenge.result
+        );
     }
 
     function cancelFromManual(

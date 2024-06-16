@@ -263,7 +263,7 @@ async function deployCreateChallenges() {
   };
 
   const predictedTotal = 4;
-  const outcome2 = "under";
+  const outcome2 = "over";
   const maturity2 = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
   const eventParam2 = coder.encode(
     ["uint256", "uint256", "string"],
@@ -292,7 +292,7 @@ async function deployCreateChallenges() {
   const assetSymbol = "XRP";
   const date = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
-  const outcome4 = "out";
+  const outcome4 = "in";
   const priceLowerBound = BigInt(60000);
   const priceUpperBound = BigInt(100000);
   const eventParam4 = coder.encode(
@@ -358,23 +358,6 @@ async function deployCreateChallenges() {
       )
   ).emit(pool, "NewChallengePool"); // creates challenge 0
 
-  // await time.increase(60 * 60 * 3);
-
-  // const homeScore = 3;
-  // const awayScore = 2;
-  // const param1 = coder.encode(
-  //   ["uint256", "uint256", "uint256"],
-  //   [matchId, homeScore, awayScore]
-  // );
-
-  // await footBallScoreProvider.connect(kofi).provideData(param1);
-
-  // const price = BigInt(70000);
-  // const param2 = coder.encode(
-  //   ["string", "uint256", "uint256"],
-  //   [assetSymbol, date, price]
-  // );
-  // await assetPriceProvider.connect(kofi).provideData(param2);
   return {
     registry,
     owner,
@@ -397,6 +380,9 @@ async function deployCreateChallenges() {
     airDropBalls,
     stkFee,
     stake,
+    matchId,
+    assetSymbol,
+    date,
   };
 }
 
@@ -531,15 +517,8 @@ describe("ChallengePool", function () {
       ).emit(pool, "JoinChallengePool");
     });
     it("Should Fail to Join Challenge", async function () {
-      const {
-        kojo,
-        kwame,
-        testBalls,
-        pool,
-        stkFee,
-        airDropBalls,
-        stake,
-      } = await loadFixture(deployCreateChallenges);
+      const { kojo, kwame, testBalls, pool, stkFee, airDropBalls, stake } =
+        await loadFixture(deployCreateChallenges);
 
       await testBalls.transfer(kwame, airDropBalls);
 
@@ -562,146 +541,285 @@ describe("ChallengePool", function () {
       await expect(
         pool.connect(kwame).joinChallenge(0, 2, stake)
       ).revertedWithCustomError(pool, "PlayerAlreadyInPool");
+      await time.increase(60 * 60 * 2);
+      await expect(pool.connect(kwame).joinChallenge(0, 2, stake))
+        .revertedWithCustomError(pool, "ActionNotAllowedForState")
+        .withArgs(6);
     });
   });
   describe("Close Challenge", function () {
     it("Should Close Challenge", async function () {
       const {
-        registry,
-        owner,
-        feeAccount,
-        otherAccount,
         kojo,
         kwame,
         kofi,
         assetPriceProvider,
-        footBallOutcomeEvaluator,
-        footBallOverUnderEvaluator,
         footBallScoreProvider,
-        footBallCorrectScoreEvaluator,
-        assetPriceBoundedEvaluator,
-        assetPriceTargetEvaluator,
-        testTrophies,
         testBalls,
         pool,
-        topicIds,
+        stkFee,
+        airDropBalls,
+        stake,
+        matchId,
+        assetSymbol,
+        date,
       } = await loadFixture(deployCreateChallenges);
+      const kwamePrediction = 2;
+
+      await testBalls.transfer(kwame, airDropBalls);
+
+      await testBalls.connect(kwame).approve(pool, stkFee);
+
+      await expect(
+        pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
+      ).emit(pool, "JoinChallengePool");
+
+      const coder = new ethers.AbiCoder();
+
+      await time.increase(60 * 60 * 3);
+
+      const homeScore = 3;
+      const awayScore = 2;
+      const param1 = coder.encode(
+        ["uint256", "uint256", "uint256"],
+        [matchId, homeScore, awayScore]
+      );
+
+      await footBallScoreProvider.connect(kofi).provideData(param1);
+
+      const price = BigInt(70000);
+      const param2 = coder.encode(
+        ["string", "uint256", "uint256"],
+        [assetSymbol, date, price]
+      );
+      await assetPriceProvider.connect(kofi).provideData(param2);
+
+      await expect(pool.connect(kojo).closeChallenge(0))
+        .emit(pool, "ClosedChallengePool")
+        .withArgs(0, await kojo.getAddress(), 1, 1);
     });
     it("Should Fail to Close Challenge", async function () {
       const {
-        registry,
-        owner,
-        feeAccount,
-        otherAccount,
-        kojo,
         kwame,
         kofi,
         assetPriceProvider,
-        footBallOutcomeEvaluator,
-        footBallOverUnderEvaluator,
         footBallScoreProvider,
-        footBallCorrectScoreEvaluator,
-        assetPriceBoundedEvaluator,
-        assetPriceTargetEvaluator,
-        testTrophies,
         testBalls,
         pool,
-        topicIds,
+        stkFee,
+        airDropBalls,
+        stake,
+        matchId,
+        assetSymbol,
+        date,
       } = await loadFixture(deployCreateChallenges);
+      const kwamePrediction = 2;
+
+      await testBalls.transfer(kwame, airDropBalls);
+
+      await testBalls.connect(kwame).approve(pool, stkFee);
+
+      await expect(
+        pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
+      ).emit(pool, "JoinChallengePool");
+
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .revertedWithCustomError(pool, "ActionNotAllowedForState")
+        .withArgs(0);
+      await expect(
+        pool.connect(kwame).closeChallenge(99)
+      ).revertedWithCustomError(pool, "InvalidChallenge");
+
+      const coder = new ethers.AbiCoder();
+
+      await time.increase(60 * 60 * 3);
+
+      const homeScore = 3;
+      const awayScore = 2;
+      const param1 = coder.encode(
+        ["uint256", "uint256", "uint256"],
+        [matchId, homeScore, awayScore]
+      );
+
+      await footBallScoreProvider.connect(kofi).provideData(param1);
+
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .emit(pool, "StaleChallengePool")
+        .withArgs(
+          0,
+          await kwame.getAddress(),
+          BigInt(await time.latest()) +
+            (await pool.staleExtensionPeriod()) +
+            BigInt(1),
+          1,
+          2
+        );
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .revertedWithCustomError(pool, "NextStalePoolRetryNotReached")
+        .withArgs(1);
+      await time.increase(60 * 60 * 1);
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .emit(pool, "StaleChallengePool")
+        .withArgs(
+          0,
+          await kwame.getAddress(),
+          BigInt(await time.latest()) +
+            (await pool.staleExtensionPeriod()) +
+            BigInt(1),
+          2,
+          2
+        );
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .revertedWithCustomError(pool, "NextStalePoolRetryNotReached")
+        .withArgs(2);
+      await time.increase(60 * 60 * 1);
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .emit(pool, "StaleChallengePool")
+        .withArgs(
+          0,
+          await kwame.getAddress(),
+          BigInt(await time.latest()) +
+            (await pool.staleExtensionPeriod()) +
+            BigInt(1),
+          3,
+          2
+        );
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .revertedWithCustomError(pool, "NextStalePoolRetryNotReached")
+        .withArgs(3);
+      await time.increase(60 * 60 * 1);
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .emit(pool, "ManualChallengePool")
+        .withArgs(0, await kwame.getAddress(), 3);
+      await expect(pool.connect(kwame).closeChallenge(0))
+        .revertedWithCustomError(pool, "ActionNotAllowedForState")
+        .withArgs(3);
+      const price = BigInt(70000);
+      const param2 = coder.encode(
+        ["string", "uint256", "uint256"],
+        [assetSymbol, date, price]
+      );
+      await assetPriceProvider.connect(kofi).provideData(param2);
     });
   });
   describe("Withdraw Winnings", function () {
     it("Should Withdraw Winnings", async function () {
       const {
-        registry,
-        owner,
-        feeAccount,
         otherAccount,
         kojo,
         kwame,
         kofi,
         assetPriceProvider,
-        footBallOutcomeEvaluator,
-        footBallOverUnderEvaluator,
         footBallScoreProvider,
-        footBallCorrectScoreEvaluator,
-        assetPriceBoundedEvaluator,
-        assetPriceTargetEvaluator,
-        testTrophies,
         testBalls,
         pool,
-        topicIds,
+        stkFee,
+        airDropBalls,
+        stake,
+        matchId,
+        assetSymbol,
+        date,
       } = await loadFixture(deployCreateChallenges);
+      const kwamePrediction = 2; // no
+
+      await testBalls.transfer(kwame, airDropBalls);
+
+      await testBalls.connect(kwame).approve(pool, stkFee);
+
+      await expect(
+        pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
+      ).emit(pool, "JoinChallengePool");
+
+      const coder = new ethers.AbiCoder();
+
+      await time.increase(60 * 60 * 3);
+
+      const homeScore = 3;
+      const awayScore = 2;
+      const param1 = coder.encode(
+        ["uint256", "uint256", "uint256"],
+        [matchId, homeScore, awayScore]
+      );
+
+      await footBallScoreProvider.connect(kofi).provideData(param1);
+
+      const price = BigInt(70000);
+      const param2 = coder.encode(
+        ["string", "uint256", "uint256"],
+        [assetSymbol, date, price]
+      );
+      await assetPriceProvider.connect(kofi).provideData(param2);
+
+      await expect(pool.connect(kojo).closeChallenge(0))
+        .emit(pool, "ClosedChallengePool")
+        .withArgs(0, await kojo.getAddress(), 1, 1);
+      await expect(pool.connect(otherAccount).withdrawWinnings(0))
+        .emit(pool, "WinningsWithdrawn")
+        .withArgs(await otherAccount.getAddress(), 0, stake, BigInt(2) * stake);
     });
     it("Should Fail to Withdraw Winnings", async function () {
       const {
-        registry,
-        owner,
-        feeAccount,
         otherAccount,
         kojo,
         kwame,
         kofi,
         assetPriceProvider,
-        footBallOutcomeEvaluator,
-        footBallOverUnderEvaluator,
         footBallScoreProvider,
-        footBallCorrectScoreEvaluator,
-        assetPriceBoundedEvaluator,
-        assetPriceTargetEvaluator,
-        testTrophies,
         testBalls,
         pool,
-        topicIds,
+        stkFee,
+        airDropBalls,
+        stake,
+        matchId,
+        assetSymbol,
+        date,
       } = await loadFixture(deployCreateChallenges);
-    });
-  });
-  describe("Batch Close Challenge", function () {
-    it("Should Batch Close Challenges", async function () {
-      const {
-        registry,
-        owner,
-        feeAccount,
-        otherAccount,
-        kojo,
-        kwame,
-        kofi,
-        assetPriceProvider,
-        footBallOutcomeEvaluator,
-        footBallOverUnderEvaluator,
-        footBallScoreProvider,
-        footBallCorrectScoreEvaluator,
-        assetPriceBoundedEvaluator,
-        assetPriceTargetEvaluator,
-        testTrophies,
-        testBalls,
+      const kwamePrediction = 2; // no
+
+      await testBalls.transfer(kwame, airDropBalls);
+
+      await testBalls.connect(kwame).approve(pool, stkFee);
+
+      await expect(
+        pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
+      ).emit(pool, "JoinChallengePool");
+
+      const coder = new ethers.AbiCoder();
+
+      await time.increase(60 * 60 * 3);
+
+      const homeScore = 3;
+      const awayScore = 2;
+      const param1 = coder.encode(
+        ["uint256", "uint256", "uint256"],
+        [matchId, homeScore, awayScore]
+      );
+
+      await footBallScoreProvider.connect(kofi).provideData(param1);
+
+      const price = BigInt(70000);
+      const param2 = coder.encode(
+        ["string", "uint256", "uint256"],
+        [assetSymbol, date, price]
+      );
+      await assetPriceProvider.connect(kofi).provideData(param2);
+
+      await expect(pool.connect(kojo).closeChallenge(0))
+        .emit(pool, "ClosedChallengePool")
+        .withArgs(0, await kojo.getAddress(), 1, 1);
+      await expect(pool.connect(otherAccount).withdrawWinnings(0)).emit(
         pool,
-        topicIds,
-      } = await loadFixture(deployCreateChallenges);
-    });
-  });
-  describe("Batch Withdraw Winnings", function () {
-    it("Should Batch Withdraw Winnings", async function () {
-      const {
-        registry,
-        owner,
-        feeAccount,
-        otherAccount,
-        kojo,
-        kwame,
-        kofi,
-        assetPriceProvider,
-        footBallOutcomeEvaluator,
-        footBallOverUnderEvaluator,
-        footBallScoreProvider,
-        footBallCorrectScoreEvaluator,
-        assetPriceBoundedEvaluator,
-        assetPriceTargetEvaluator,
-        testTrophies,
-        testBalls,
-        pool,
-        topicIds,
-      } = await loadFixture(deployCreateChallenges);
+        "WinningsWithdrawn"
+      );
+      await expect(
+        pool.connect(otherAccount).withdrawWinnings(0)
+      ).revertedWithCustomError(pool, "PlayerWinningAlreadyWithdrawn");
+      await expect(
+        pool.connect(kwame).withdrawWinnings(0)
+      ).revertedWithCustomError(pool, "PlayerDidNotWinPool");
+      await expect(
+        pool.connect(kojo).withdrawWinnings(0)
+      ).revertedWithCustomError(pool, "PlayerNotInPool");
     });
   });
 });

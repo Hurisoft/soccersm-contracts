@@ -102,3 +102,6 @@ Url - https://explorer-holesky.morphl2.io/address/0x252Ba1b6E8b97Fa4759d4F180244
 Deploy - `npx hardhat run scripts/deploy_asset_price_target_evaluator.ts --network morphTestnet`
 Verify - `npx hardhat verify [ASSET_PRICE_TARGET_EVALUATOR] [ASSET_PRICE_PROVIDER] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0xC080c3Bad87f90F00ce49C5953dFDd1189918adA
+
+#### Create Topics
+`npx hardhat run scripts/create_topics.ts --network morphTestnet`

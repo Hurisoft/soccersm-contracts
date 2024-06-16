@@ -1,11 +1,11 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const shadow = await ethers.deployContract("PoolChallange");
+  const shadow = await ethers.deployContract("Balls");
 
   await shadow.waitForDeployment();
 
-  const { ...tx} = shadow.deploymentTransaction()?.toJSON();
+  const { ...tx } = shadow.deploymentTransaction()?.toJSON();
   tx.data = await shadow.getAddress();
 
   console.log(`deployed to ${JSON.stringify(tx, null, 2)}`);

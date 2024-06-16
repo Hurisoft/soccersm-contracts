@@ -7,7 +7,6 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 async function deployChallengePool() {
-
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
 
@@ -20,35 +19,58 @@ async function deployChallengePool() {
   const footBallScoreProvider = await FootballScoreProvider.deploy();
 
   await footBallScoreProvider.addProvider(owner);
-  console.log(await footBallScoreProvider.getAddress(), "FootballScoreProvider");
+  console.log(
+    await footBallScoreProvider.getAddress(),
+    "FootballScoreProvider"
+  );
 
   const FootballOutcomeEvaluator = await ethers.getContractFactory(
     "FootballOutcomeEvaluator"
   );
 
-  const footBallOutcomeEvaluator = await FootballOutcomeEvaluator.deploy(footBallScoreProvider);
+  const footBallOutcomeEvaluator = await FootballOutcomeEvaluator.deploy(
+    footBallScoreProvider
+  );
 
-  console.log(await footBallOutcomeEvaluator.getAddress(),"FootballOutcomeEvaluator");
+  console.log(
+    await footBallOutcomeEvaluator.getAddress(),
+    "FootballOutcomeEvaluator"
+  );
 
-  await footBallScoreProvider.addReader(await footBallOutcomeEvaluator.getAddress());
+  await footBallScoreProvider.addReader(
+    await footBallOutcomeEvaluator.getAddress()
+  );
 
   const FootballOverUnderEvaluator = await ethers.getContractFactory(
     "FootballOverUnderEvaluator"
   );
 
-  const footBallOverUnderEvaluator = await FootballOverUnderEvaluator.deploy(footBallScoreProvider);
-  console.log(await footBallOverUnderEvaluator.getAddress(), "FootballOverUnderEvaluator");
+  const footBallOverUnderEvaluator = await FootballOverUnderEvaluator.deploy(
+    footBallScoreProvider
+  );
+  console.log(
+    await footBallOverUnderEvaluator.getAddress(),
+    "FootballOverUnderEvaluator"
+  );
 
-  await footBallScoreProvider.addReader(await footBallOverUnderEvaluator.getAddress());
+  await footBallScoreProvider.addReader(
+    await footBallOverUnderEvaluator.getAddress()
+  );
 
   const FootBallCorrectScoreEvaluator = await ethers.getContractFactory(
     "FootBallCorrectScoreEvaluator"
   );
 
-  const footBallCorrectScoreEvaluator = await FootBallCorrectScoreEvaluator.deploy(footBallScoreProvider);
-  console.log(await footBallCorrectScoreEvaluator.getAddress(), "FootBallCorrectScoreEvaluator");
+  const footBallCorrectScoreEvaluator =
+    await FootBallCorrectScoreEvaluator.deploy(footBallScoreProvider);
+  console.log(
+    await footBallCorrectScoreEvaluator.getAddress(),
+    "FootBallCorrectScoreEvaluator"
+  );
 
-  await footBallScoreProvider.addReader(await footBallCorrectScoreEvaluator.getAddress());
+  await footBallScoreProvider.addReader(
+    await footBallCorrectScoreEvaluator.getAddress()
+  );
 
   const AssetPriceProvider = await ethers.getContractFactory(
     "AssetPriceProvider"
@@ -62,25 +84,38 @@ async function deployChallengePool() {
     "AssetPriceBoundedEvaluator"
   );
 
-  const assetPriceBoundedEvaluator = await AssetPriceBoundedEvaluator.deploy(assetPriceProvider);
+  const assetPriceBoundedEvaluator = await AssetPriceBoundedEvaluator.deploy(
+    assetPriceProvider
+  );
 
-  console.log(await assetPriceBoundedEvaluator.getAddress(), "AssetPriceBoundedEvaluator");
+  console.log(
+    await assetPriceBoundedEvaluator.getAddress(),
+    "AssetPriceBoundedEvaluator"
+  );
 
-  await assetPriceProvider.addReader(await assetPriceBoundedEvaluator.getAddress());
+  await assetPriceProvider.addReader(
+    await assetPriceBoundedEvaluator.getAddress()
+  );
 
   const AssetPriceTargetEvaluator = await ethers.getContractFactory(
     "AssetPriceTargetEvaluator"
   );
 
-  const assetPriceTargetEvaluator = await AssetPriceTargetEvaluator.deploy(assetPriceProvider);
+  const assetPriceTargetEvaluator = await AssetPriceTargetEvaluator.deploy(
+    assetPriceProvider
+  );
 
-  console.log( await assetPriceTargetEvaluator.getAddress(), "AssetPriceTargetEvaluator");
+  console.log(
+    await assetPriceTargetEvaluator.getAddress(),
+    "AssetPriceTargetEvaluator"
+  );
 
-  await assetPriceProvider.addReader(await assetPriceTargetEvaluator.getAddress());
+  await assetPriceProvider.addReader(
+    await assetPriceTargetEvaluator.getAddress()
+  );
 
   await assetPriceProvider.addProvider(await kofi.getAddress());
   await footBallScoreProvider.addProvider(await kofi.getAddress());
-
 
   await registry.createTopic(
     "Football Outcome Events",
@@ -117,7 +152,7 @@ async function deployChallengePool() {
     await footBallOverUnderEvaluator.getAddress(),
     "footBallOverUnderEvaluator\n",
     await footBallOutcomeEvaluator.getAddress(),
-    "footBallOutcomeEvaluator\n",
+    "footBallOutcomeEvaluator\n"
   );
 
   const topicIds = {
@@ -311,41 +346,35 @@ async function deployCreateChallenges() {
 
   await testBalls.connect(otherAccount).approve(pool, stkFee);
 
-  await pool
-    .connect(otherAccount)
-    .createChallenge(
-      _eventsParams,
-      _eventsMaturity,
-      _eventsTopics,
-      prediction,
-      stake
-    ); // creates challenge 0
+  await expect(
+    pool
+      .connect(otherAccount)
+      .createChallenge(
+        _eventsParams,
+        _eventsMaturity,
+        _eventsTopics,
+        prediction,
+        stake
+      )
+  ).emit(pool, "NewChallengePool"); // creates challenge 0
 
-  const kwamePrediction = 2;
+  // await time.increase(60 * 60 * 3);
 
-  await testBalls.transfer(kwame, airDropBalls);
+  // const homeScore = 3;
+  // const awayScore = 2;
+  // const param1 = coder.encode(
+  //   ["uint256", "uint256", "uint256"],
+  //   [matchId, homeScore, awayScore]
+  // );
 
-  await testBalls.connect(kwame).approve(pool, stkFee);
+  // await footBallScoreProvider.connect(kofi).provideData(param1);
 
-  await pool.connect(kwame).joinChallenge(0, kwamePrediction, stake);
-
-  await time.increase(60 * 60 * 3);
-
-  const homeScore = 3;
-  const awayScore = 2;
-  const param1 = coder.encode(
-    ["uint256", "uint256", "uint256"],
-    [matchId, homeScore, awayScore]
-  );
-
-  await footBallScoreProvider.connect(kofi).provideData(param1);
-
-  const price = BigInt(70000);
-  const param2 = coder.encode(
-    ["string", "uint256", "uint256"],
-    [assetSymbol, date, price]
-  );
-  await assetPriceProvider.connect(kofi).provideData(param2);
+  // const price = BigInt(70000);
+  // const param2 = coder.encode(
+  //   ["string", "uint256", "uint256"],
+  //   [assetSymbol, date, price]
+  // );
+  // await assetPriceProvider.connect(kofi).provideData(param2);
   return {
     registry,
     owner,
@@ -365,6 +394,9 @@ async function deployCreateChallenges() {
     testBalls,
     pool,
     topicIds,
+    airDropBalls,
+    stkFee,
+    stake,
   };
 }
 
@@ -379,26 +411,9 @@ describe("ChallengePool", function () {
       await loadFixture(deployCreateChallenges);
     });
     it("Should Fail to Create Challenge", async function () {
-      const {
-        registry,
-        owner,
-        feeAccount,
-        otherAccount,
-        kojo,
-        kwame,
-        kofi,
-        assetPriceProvider,
-        footBallOutcomeEvaluator,
-        footBallOverUnderEvaluator,
-        footBallScoreProvider,
-        footBallCorrectScoreEvaluator,
-        assetPriceBoundedEvaluator,
-        assetPriceTargetEvaluator,
-        testTrophies,
-        testBalls,
-        pool,
-        topicIds,
-      } = await loadFixture(deployCreateChallenges);
+      const { otherAccount, pool, topicIds } = await loadFixture(
+        deployCreateChallenges
+      );
       const coder = new ethers.AbiCoder();
       const matchId = 99;
 
@@ -418,7 +433,7 @@ describe("ChallengePool", function () {
             1,
             BigInt(10000 * 1e18)
           )
-      ).to.revertedWithCustomError(pool, "UserLacksEnoughBalls");
+      ).to.revertedWithCustomError(pool, "UserLacksBalls");
       await expect(
         pool
           .connect(otherAccount)
@@ -468,7 +483,7 @@ describe("ChallengePool", function () {
           .connect(otherAccount)
           .createChallenge(eventParam1, maturity1, [9], 1, BigInt(1000 * 1e18))
       ).to.revertedWithCustomError(pool, "InvalidEventTopic");
-      const maturity4 = [Math.floor(Date.now() / 1000) + 60 * 60 * 4];
+      const maturity4 = [Math.floor(Date.now() / 1000)];
       await expect(
         pool
           .connect(otherAccount)
@@ -500,9 +515,193 @@ describe("ChallengePool", function () {
         .withArgs(anyValue, anyValue);
     });
   });
-  describe("Join Challenge", function () {});
-  describe("Close Challenge", function () {});
-  describe("Withdraw Winnings", function () {});
-  describe("Batch Close Challenge", function () {});
-  describe("Batch Withdraw Winnings", function () {});
+  describe("Join Challenge", function () {
+    it("Should Join Challenge", async function () {
+      const { kwame, testBalls, pool, stkFee, airDropBalls, stake } =
+        await loadFixture(deployCreateChallenges);
+
+      const kwamePrediction = 2;
+
+      await testBalls.transfer(kwame, airDropBalls);
+
+      await testBalls.connect(kwame).approve(pool, stkFee);
+
+      await expect(
+        pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
+      ).emit(pool, "JoinChallengePool");
+    });
+    it("Should Fail to Join Challenge", async function () {
+      const {
+        kojo,
+        kwame,
+        testBalls,
+        pool,
+        stkFee,
+        airDropBalls,
+        stake,
+      } = await loadFixture(deployCreateChallenges);
+
+      await testBalls.transfer(kwame, airDropBalls);
+
+      await testBalls.connect(kwame).approve(pool, stkFee);
+
+      await expect(
+        pool.connect(kwame).joinChallenge(0, 0, stake)
+      ).revertedWithCustomError(pool, "InvalidPrediction");
+
+      await expect(
+        pool.connect(kwame).joinChallenge(1, 1, stake)
+      ).revertedWithCustomError(pool, "InvalidChallenge");
+
+      await expect(
+        pool.connect(kojo).joinChallenge(0, 1, stake)
+      ).revertedWithCustomError(pool, "UserLacksBalls");
+
+      await pool.connect(kwame).joinChallenge(0, 2, stake);
+      await testBalls.connect(kwame).approve(pool, stkFee);
+      await expect(
+        pool.connect(kwame).joinChallenge(0, 2, stake)
+      ).revertedWithCustomError(pool, "PlayerAlreadyInPool");
+    });
+  });
+  describe("Close Challenge", function () {
+    it("Should Close Challenge", async function () {
+      const {
+        registry,
+        owner,
+        feeAccount,
+        otherAccount,
+        kojo,
+        kwame,
+        kofi,
+        assetPriceProvider,
+        footBallOutcomeEvaluator,
+        footBallOverUnderEvaluator,
+        footBallScoreProvider,
+        footBallCorrectScoreEvaluator,
+        assetPriceBoundedEvaluator,
+        assetPriceTargetEvaluator,
+        testTrophies,
+        testBalls,
+        pool,
+        topicIds,
+      } = await loadFixture(deployCreateChallenges);
+    });
+    it("Should Fail to Close Challenge", async function () {
+      const {
+        registry,
+        owner,
+        feeAccount,
+        otherAccount,
+        kojo,
+        kwame,
+        kofi,
+        assetPriceProvider,
+        footBallOutcomeEvaluator,
+        footBallOverUnderEvaluator,
+        footBallScoreProvider,
+        footBallCorrectScoreEvaluator,
+        assetPriceBoundedEvaluator,
+        assetPriceTargetEvaluator,
+        testTrophies,
+        testBalls,
+        pool,
+        topicIds,
+      } = await loadFixture(deployCreateChallenges);
+    });
+  });
+  describe("Withdraw Winnings", function () {
+    it("Should Withdraw Winnings", async function () {
+      const {
+        registry,
+        owner,
+        feeAccount,
+        otherAccount,
+        kojo,
+        kwame,
+        kofi,
+        assetPriceProvider,
+        footBallOutcomeEvaluator,
+        footBallOverUnderEvaluator,
+        footBallScoreProvider,
+        footBallCorrectScoreEvaluator,
+        assetPriceBoundedEvaluator,
+        assetPriceTargetEvaluator,
+        testTrophies,
+        testBalls,
+        pool,
+        topicIds,
+      } = await loadFixture(deployCreateChallenges);
+    });
+    it("Should Fail to Withdraw Winnings", async function () {
+      const {
+        registry,
+        owner,
+        feeAccount,
+        otherAccount,
+        kojo,
+        kwame,
+        kofi,
+        assetPriceProvider,
+        footBallOutcomeEvaluator,
+        footBallOverUnderEvaluator,
+        footBallScoreProvider,
+        footBallCorrectScoreEvaluator,
+        assetPriceBoundedEvaluator,
+        assetPriceTargetEvaluator,
+        testTrophies,
+        testBalls,
+        pool,
+        topicIds,
+      } = await loadFixture(deployCreateChallenges);
+    });
+  });
+  describe("Batch Close Challenge", function () {
+    it("Should Batch Close Challenges", async function () {
+      const {
+        registry,
+        owner,
+        feeAccount,
+        otherAccount,
+        kojo,
+        kwame,
+        kofi,
+        assetPriceProvider,
+        footBallOutcomeEvaluator,
+        footBallOverUnderEvaluator,
+        footBallScoreProvider,
+        footBallCorrectScoreEvaluator,
+        assetPriceBoundedEvaluator,
+        assetPriceTargetEvaluator,
+        testTrophies,
+        testBalls,
+        pool,
+        topicIds,
+      } = await loadFixture(deployCreateChallenges);
+    });
+  });
+  describe("Batch Withdraw Winnings", function () {
+    it("Should Batch Withdraw Winnings", async function () {
+      const {
+        registry,
+        owner,
+        feeAccount,
+        otherAccount,
+        kojo,
+        kwame,
+        kofi,
+        assetPriceProvider,
+        footBallOutcomeEvaluator,
+        footBallOverUnderEvaluator,
+        footBallScoreProvider,
+        footBallCorrectScoreEvaluator,
+        assetPriceBoundedEvaluator,
+        assetPriceTargetEvaluator,
+        testTrophies,
+        testBalls,
+        pool,
+        topicIds,
+      } = await loadFixture(deployCreateChallenges);
+    });
+  });
 });

@@ -135,7 +135,7 @@ abstract contract IChallengePool is Helpers {
     error StakeLowerThanMinimum();
     error ProtocolInvariantCheckFailed();
     error NextStalePoolRetryNotReached();
-    error UserLacksEnoughBalls();
+    error UserLacksBalls();
     error InvalidLengthForEvent(
         uint256 _params,
         uint256 _maturity,
@@ -292,7 +292,7 @@ abstract contract IChallengePool is Helpers {
 
     function _senderHasBalls(uint256 _amount) internal view {
         if (IERC20(balls).balanceOf(msg.sender) < _amount) {
-            revert UserLacksEnoughBalls();
+            revert UserLacksBalls();
         }
     }
 

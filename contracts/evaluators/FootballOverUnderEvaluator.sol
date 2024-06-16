@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.26;
 
-import "hardhat/console.sol";
 import "../interfaces/IChallengePool.sol";
 import "../interfaces/IEvaluator.sol";
 
 import "../utils/helpers.sol";
-import "hardhat/console.sol";
 
 contract FootballOverUnderEvaluator is IEvaluator, Helpers {
     string public constant OVER = "over";
@@ -18,7 +16,6 @@ contract FootballOverUnderEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        console.log("FootballOverUnderEvaluator");
         (uint256 matchId, uint256 predictedTotal, string memory outcome) = abi
             .decode(_challengeEvent.eventParam, (uint256, uint256, string));
         if (!compareStrings(outcome, OVER) && !compareStrings(outcome, UNDER)) {

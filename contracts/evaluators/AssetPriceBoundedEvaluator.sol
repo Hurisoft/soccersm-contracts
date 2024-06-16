@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.26;
 
-import "hardhat/console.sol";
 import "../interfaces/IChallengePool.sol";
 import "../interfaces/IEvaluator.sol";
 
@@ -17,7 +16,6 @@ contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        console.log("AssetPriceBoundedEvaluator");
         (
             string memory assetSymbol,
             uint256 priceLowerBound,
@@ -27,11 +25,9 @@ contract AssetPriceBoundedEvaluator is IEvaluator, Helpers {
                 _challengeEvent.eventParam,
                 (string, uint256, uint256, string)
             );
-        console.log("compare");
         if (!compareStrings(outcome, IN) && !compareStrings(outcome, OUT)) {
             return false;
         }
-        console.log("price");
         if (priceLowerBound >= priceUpperBound) {
             return false;
         }

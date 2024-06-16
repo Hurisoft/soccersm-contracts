@@ -12,7 +12,7 @@ const config: HardhatUserConfig = {
       viaIR: true,
       optimizer: {
         enabled: true,
-        runs: 9999,
+        runs: 99999,
       },
       evmVersion: "london",
     },

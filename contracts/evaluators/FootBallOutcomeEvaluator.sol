@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.26;
 
-import "hardhat/console.sol";
 import "../interfaces/IChallengePool.sol";
 import "../interfaces/IEvaluator.sol";
 
@@ -21,7 +20,6 @@ contract FootballOutcomeEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        console.log("FootballOutcomeEvaluator");
         (uint256 matchId, string memory outcome) = abi.decode(
             _challengeEvent.eventParam,
             (uint256, string)

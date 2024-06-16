@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.26;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/ITopicDataProvider.sol";
@@ -41,7 +40,6 @@ contract AssetPriceProvider is ITopicDataProvider, DataProviderAccess {
     function requestData(
         bytes calldata _params
     ) external override onlyReader returns (bool) {
-        console.log("requestData");
         (string memory assetSymbol, uint256 date) = abi.decode(
             _params,
             (string, uint256)

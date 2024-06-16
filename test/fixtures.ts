@@ -65,7 +65,7 @@ import {
   
     const evaluator = await FootballOutcomeEvaluator.deploy(provider);
 
-    console.log(await evaluator.getAddress(), "FootballOutcomeEvaluator");
+    console.log(await evaluator.getAddress(),"FootballOutcomeEvaluator");
   
     await provider.addReader(await evaluator.getAddress());
   
@@ -95,7 +95,7 @@ import {
     );
   
     const evaluator = await FootBallCorrectScoreEvaluator.deploy(provider);
-    console.log("FootBallCorrectScoreEvaluator", await evaluator.getAddress());
+    console.log(await evaluator.getAddress(), "FootBallCorrectScoreEvaluator");
   
     await provider.addReader(await evaluator.getAddress());
   
@@ -125,7 +125,7 @@ import {
     );
   
     const evaluator = await FootballOverUnderEvaluator.deploy(provider);
-    console.log("FootballOverUnderEvaluator", await evaluator.getAddress());
+    console.log(await evaluator.getAddress(), "FootballOverUnderEvaluator");
   
     await provider.addReader(await evaluator.getAddress());
   
@@ -201,7 +201,7 @@ export async function deployAssetPriceProviderWithKofiProvder() {
   
     const evaluator = await AssetPriceTargetEvaluator.deploy(provider);
   
-    console.log('AssetPriceTargetEvaluator', await evaluator.getAddress());
+    console.log( await evaluator.getAddress(), "AssetPriceTargetEvaluator");
   
     await provider.addReader(await evaluator.getAddress());
   
@@ -232,7 +232,7 @@ export async function deployAssetPriceProviderWithKofiProvder() {
   
     const evaluator = await AssetPriceBoundedEvaluator.deploy(provider);
   
-    console.log('AssetPriceBoundedEvaluator', await evaluator.getAddress());
+    console.log(await evaluator.getAddress(), "AssetPriceBoundedEvaluator");
     
   
     await provider.addReader(await evaluator.getAddress());

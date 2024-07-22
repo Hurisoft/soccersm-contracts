@@ -59,7 +59,6 @@ abstract contract IChallengePool is Helpers {
     uint256 public accumulatedFee = 0;
     address public feeAddress;
     ITopicRegistry public topicRegistry;
-    IERC20 public trophies;
     IERC20 public balls;
 
     // ============ ================= ==============
@@ -197,8 +196,6 @@ abstract contract IChallengePool is Helpers {
     function setMaxStaleRetries(uint256 _maxStaleRetries) external virtual;
 
     function setTopicRegistry(address _topicRegistry) external virtual;
-
-    function setTrophiesAddress(address _trophiesAddress) external virtual;
 
     function setBallsAddress(address _ballsAddress) external virtual;
 

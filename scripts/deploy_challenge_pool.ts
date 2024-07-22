@@ -1,7 +1,5 @@
 import { ethers } from "hardhat";
 import * as dotenv from "dotenv";
-import { Etherscan } from "@nomicfoundation/hardhat-verify/etherscan";
-import { sleep } from "@nomicfoundation/hardhat-verify/internal/utilities";
 dotenv.config();
 async function main() {
   const ONE_HOUR = 60 * 60;

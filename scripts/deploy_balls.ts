@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const shadow = await ethers.deployContract("Balls");
+  const shadow = await ethers.deployContract("BallsToken");
 
   await shadow.waitForDeployment();
 

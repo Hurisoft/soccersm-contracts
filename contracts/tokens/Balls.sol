@@ -7,7 +7,7 @@ import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20P
 
 contract BallsToken is ERC20, ERC20Permit {
     constructor() ERC20("Balls Token", "BALLS") ERC20Permit("Balls Token") {
-        _mint(_msgSender(), 100_000_000 * 1e18);
+        _mint(_msgSender(), 1_000_000_000 * 1e18);
     }
 }
 

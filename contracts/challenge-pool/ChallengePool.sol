@@ -20,7 +20,6 @@ contract ChallengePool is IChallengePool, Ownable {
         uint256 _staleExtensionPeriod,
         address _feeAddress,
         address _topicRegistry,
-        address _trophiesAddress,
         address _ballsAddress
     ) Ownable(msg.sender) {
         poolFee = _poolFee;
@@ -34,7 +33,6 @@ contract ChallengePool is IChallengePool, Ownable {
         staleExtensionPeriod = _staleExtensionPeriod;
         feeAddress = _feeAddress;
         balls = IERC20(_ballsAddress);
-        trophies = IERC20(_trophiesAddress);
         topicRegistry = ITopicRegistry(_topicRegistry);
     }
     function setFeeAddress(
@@ -79,12 +77,6 @@ contract ChallengePool is IChallengePool, Ownable {
         address _topicRegistry
     ) external override onlyOwner positiveAddress(_topicRegistry) {
         topicRegistry = ITopicRegistry(_topicRegistry);
-    }
-
-    function setTrophiesAddress(
-        address _trophiesAddress
-    ) external override onlyOwner positiveAddress(_trophiesAddress) {
-        trophies = IERC20(_trophiesAddress);
     }
 
     function setBallsAddress(

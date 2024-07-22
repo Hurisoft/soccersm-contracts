@@ -48,15 +48,15 @@ Url - https://explorer-holesky.morphl2.io/address/0x8BA0d448FAD5469D0BE9E7aF3c2b
 
 ##### Balls
 
-Deploy - `npx hardhat run scripts/deploy_test_balls.ts --network morphTestnet`
+Deploy - `npx hardhat run scripts/deploy_balls.ts --network morphTestnet`
 Verify - `npx hardhat verify [BALLS] --network morphTestnet --contract contracts/test/TestBalls.sol:TestBalls`
-Url - https://explorer-holesky.morphl2.io/address/0x6656fB94F441B3713BC61E76e1a890E01C1DE433
+Url - https://explorer-holesky.morphl2.io/address/0x93116dD2854cAD543175BFB02966895Cef56f77E
 
-##### Trophies
+##### BallsFaucet
 
-Deploy - `npx hardhat run scripts/deploy_test_trophies.ts --network morphTestnet`
-Verify - `npx hardhat verify [TROPHIES] --network morphTestnet --contract contracts/test/TestTrophies.sol:TestTrophies`
-Url - https://explorer-holesky.morphl2.io/address/0x3CB9BAf9b481c38940aeb1EBfc0Dc25B9707A39b
+Deploy - `npx hardhat run scripts/deploy_faucet.ts --network morphTestnet`
+Verify - `npx hardhat verify [BALLS] --network morphTestnet --contract contracts/test/TestBalls.sol:TestBalls`
+Url - https://explorer-holesky.morphl2.io/address/0xF67cf0708247457AEa36D600A51C8FF42DC97Af4
 
 #### Challenge Pool
 

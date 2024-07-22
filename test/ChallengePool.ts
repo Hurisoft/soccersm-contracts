@@ -162,12 +162,9 @@ async function deployChallengePool() {
     boundedPrice: 3,
     targetPrice: 4,
   };
-  // deploy test trophies
-  const TestTrophies = await ethers.getContractFactory("TestTrophies");
-  const testTrophies = await TestTrophies.deploy();
   // deploy test balls
-  const TestBalls = await ethers.getContractFactory("TestBalls");
-  const testBalls = await TestBalls.deploy();
+  const BallsToken = await ethers.getContractFactory("BallsToken");
+  const ballsToken = await BallsToken.deploy();
 
   const ONE_HOUR = 60 * 60;
   const ONE_DAY = ONE_HOUR * 24;
@@ -183,8 +180,7 @@ async function deployChallengePool() {
   const maxStaleRetries = 3;
   const staleExtensionPeriod = ONE_HOUR;
   const feeAddress = feeAccount;
-  const balls = testBalls;
-  const trophies = testTrophies;
+  const balls = ballsToken;
   const topicRegistry = registry;
 
   // deploy challenge
@@ -202,7 +198,6 @@ async function deployChallengePool() {
     staleExtensionPeriod,
     feeAddress,
     topicRegistry,
-    trophies,
     balls
   );
 
@@ -221,8 +216,7 @@ async function deployChallengePool() {
     footBallCorrectScoreEvaluator,
     assetPriceBoundedEvaluator,
     assetPriceTargetEvaluator,
-    testTrophies,
-    testBalls,
+    ballsToken,
     pool,
     topicIds,
   };
@@ -244,8 +238,7 @@ async function deployCreateChallenges() {
     footBallCorrectScoreEvaluator,
     assetPriceBoundedEvaluator,
     assetPriceTargetEvaluator,
-    testTrophies,
-    testBalls,
+    ballsToken,
     pool,
     topicIds,
   } = await loadFixture(deployChallengePool);
@@ -342,9 +335,9 @@ async function deployCreateChallenges() {
 
   const airDropBalls = BigInt(10000 * 1e18);
 
-  await testBalls.transfer(otherAccount, airDropBalls);
+  await ballsToken.transfer(otherAccount, airDropBalls);
 
-  await testBalls.connect(otherAccount).approve(pool, stkFee);
+  await ballsToken.connect(otherAccount).approve(pool, stkFee);
 
   await expect(
     pool
@@ -373,8 +366,7 @@ async function deployCreateChallenges() {
     footBallCorrectScoreEvaluator,
     assetPriceBoundedEvaluator,
     assetPriceTargetEvaluator,
-    testTrophies,
-    testBalls,
+    ballsToken,
     pool,
     topicIds,
     airDropBalls,
@@ -503,26 +495,26 @@ describe("ChallengePool", function () {
   });
   describe("Join Challenge", function () {
     it("Should Join Challenge", async function () {
-      const { kwame, testBalls, pool, stkFee, airDropBalls, stake } =
+      const { kwame, ballsToken, pool, stkFee, airDropBalls, stake } =
         await loadFixture(deployCreateChallenges);
 
       const kwamePrediction = 2;
 
-      await testBalls.transfer(kwame, airDropBalls);
+      await ballsToken.transfer(kwame, airDropBalls);
 
-      await testBalls.connect(kwame).approve(pool, stkFee);
+      await ballsToken.connect(kwame).approve(pool, stkFee);
 
       await expect(
         pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
       ).emit(pool, "JoinChallengePool");
     });
     it("Should Fail to Join Challenge", async function () {
-      const { kojo, kwame, testBalls, pool, stkFee, airDropBalls, stake } =
+      const { kojo, kwame, ballsToken, pool, stkFee, airDropBalls, stake } =
         await loadFixture(deployCreateChallenges);
 
-      await testBalls.transfer(kwame, airDropBalls);
+      await ballsToken.transfer(kwame, airDropBalls);
 
-      await testBalls.connect(kwame).approve(pool, stkFee);
+      await ballsToken.connect(kwame).approve(pool, stkFee);
 
       await expect(
         pool.connect(kwame).joinChallenge(0, 0, stake)
@@ -537,7 +529,7 @@ describe("ChallengePool", function () {
       ).revertedWithCustomError(pool, "UserLacksBalls");
 
       await pool.connect(kwame).joinChallenge(0, 2, stake);
-      await testBalls.connect(kwame).approve(pool, stkFee);
+      await ballsToken.connect(kwame).approve(pool, stkFee);
       await expect(
         pool.connect(kwame).joinChallenge(0, 2, stake)
       ).revertedWithCustomError(pool, "PlayerAlreadyInPool");
@@ -555,7 +547,7 @@ describe("ChallengePool", function () {
         kofi,
         assetPriceProvider,
         footBallScoreProvider,
-        testBalls,
+        ballsToken,
         pool,
         stkFee,
         airDropBalls,
@@ -566,9 +558,9 @@ describe("ChallengePool", function () {
       } = await loadFixture(deployCreateChallenges);
       const kwamePrediction = 2;
 
-      await testBalls.transfer(kwame, airDropBalls);
+      await ballsToken.transfer(kwame, airDropBalls);
 
-      await testBalls.connect(kwame).approve(pool, stkFee);
+      await ballsToken.connect(kwame).approve(pool, stkFee);
 
       await expect(
         pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
@@ -604,7 +596,7 @@ describe("ChallengePool", function () {
         kofi,
         assetPriceProvider,
         footBallScoreProvider,
-        testBalls,
+        ballsToken,
         pool,
         stkFee,
         airDropBalls,
@@ -615,9 +607,9 @@ describe("ChallengePool", function () {
       } = await loadFixture(deployCreateChallenges);
       const kwamePrediction = 2;
 
-      await testBalls.transfer(kwame, airDropBalls);
+      await ballsToken.transfer(kwame, airDropBalls);
 
-      await testBalls.connect(kwame).approve(pool, stkFee);
+      await ballsToken.connect(kwame).approve(pool, stkFee);
 
       await expect(
         pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
@@ -711,7 +703,7 @@ describe("ChallengePool", function () {
         kofi,
         assetPriceProvider,
         footBallScoreProvider,
-        testBalls,
+        ballsToken,
         pool,
         stkFee,
         airDropBalls,
@@ -722,9 +714,9 @@ describe("ChallengePool", function () {
       } = await loadFixture(deployCreateChallenges);
       const kwamePrediction = 2; // no
 
-      await testBalls.transfer(kwame, airDropBalls);
+      await ballsToken.transfer(kwame, airDropBalls);
 
-      await testBalls.connect(kwame).approve(pool, stkFee);
+      await ballsToken.connect(kwame).approve(pool, stkFee);
 
       await expect(
         pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)
@@ -765,7 +757,7 @@ describe("ChallengePool", function () {
         kofi,
         assetPriceProvider,
         footBallScoreProvider,
-        testBalls,
+        ballsToken,
         pool,
         stkFee,
         airDropBalls,
@@ -776,9 +768,9 @@ describe("ChallengePool", function () {
       } = await loadFixture(deployCreateChallenges);
       const kwamePrediction = 2; // no
 
-      await testBalls.transfer(kwame, airDropBalls);
+      await ballsToken.transfer(kwame, airDropBalls);
 
-      await testBalls.connect(kwame).approve(pool, stkFee);
+      await ballsToken.connect(kwame).approve(pool, stkFee);
 
       await expect(
         pool.connect(kwame).joinChallenge(0, kwamePrediction, stake)

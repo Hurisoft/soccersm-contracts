@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ITopicRegistry.sol";
 import "./IEvaluator.sol";
-import "../utils/helpers.sol";
+import "../utils/Helpers.sol";
 
 abstract contract IChallengePool is Helpers {
     enum PoolState {

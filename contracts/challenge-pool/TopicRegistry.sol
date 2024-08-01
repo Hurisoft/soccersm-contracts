@@ -3,7 +3,7 @@ pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/ITopicRegistry.sol";
-import "../utils/helpers.sol";
+import "../utils/Helpers.sol";
 import "../interfaces/IEvaluator.sol";
 
 contract TopicRegistry is Ownable, ITopicRegistry, Helpers {

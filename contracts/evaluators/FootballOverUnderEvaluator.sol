@@ -4,7 +4,7 @@ pragma solidity ^0.8.26;
 import "../interfaces/IChallengePool.sol";
 import "../interfaces/IEvaluator.sol";
 
-import "../utils/helpers.sol";
+import "../utils/Helpers.sol";
 
 contract FootballOverUnderEvaluator is IEvaluator, Helpers {
     string public constant OVER = "over";

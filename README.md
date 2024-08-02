@@ -73,9 +73,13 @@ Url - https://explorer-holesky.morphl2.io/address/0x87a0Ab77f3F4A4E525EBA0CdFac8
 
 ##### Football Score Provider
 Deploy - `npx hardhat run scripts/deploy_football_score_provider.ts --network morphTestnet`
-Verify - `npx hardhat verify [FOOTBALL_SCORE_PROVIDER] --network morphTestnet`
+Verify - `npx hardhat verify [GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0x165a2B4F2e9C6c85D545c34aE3f00D1A2A5877eA
 
+##### General Statement Provider
+Deploy - `npx hardhat run scripts/deploy_general_statement_provider.ts --network morphTestnet`
+Verify - `npx hardhat verify [FOOTBALL_SCORE_PROVIDER] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0x3462AA899f5b0ba0b908f82EEbE2D2969EC44A1c
 #### Deploy Evaluators
 
 ##### Football Outcome Evaluator
@@ -103,5 +107,13 @@ Deploy - `npx hardhat run scripts/deploy_asset_price_target_evaluator.ts --netwo
 Verify - `npx hardhat verify [ASSET_PRICE_TARGET_EVALUATOR] [ASSET_PRICE_PROVIDER] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0xC080c3Bad87f90F00ce49C5953dFDd1189918adA
 
+##### General Statement Evaluator
+Deploy - `npx hardhat run scripts/deploy_general_statement_evaluator.ts --network morphTestnet`
+Verify - `npx hardhat verify [GENERAL_STATEMENT_EVALUATOR] [GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0x3Ee3BD686c2ed6e56B7484401D047f317BeB0881
+
 #### Create Topics
 `npx hardhat run scripts/create_topics.ts --network morphTestnet`
+
+#### Create General Statements
+`npx hardhat run scripts/create_statements.ts --network morphTestnet`

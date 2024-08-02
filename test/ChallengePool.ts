@@ -114,8 +114,36 @@ async function deployChallengePool() {
     await assetPriceTargetEvaluator.getAddress()
   );
 
+  const GeneralStatementProvider = await ethers.getContractFactory(
+    "GeneralStatementProvider"
+  );
+  const generalStatementProvider = await GeneralStatementProvider.deploy();
+
+  await generalStatementProvider.addProvider(owner);
+  console.log(
+    await generalStatementProvider.getAddress(),
+    "GeneralStatementProvider"
+  );
+
+  const GeneralStatementEvaluator = await ethers.getContractFactory(
+    "GeneralStatementEvaluator"
+  );
+
+  const generalStatementEvaluator = await GeneralStatementEvaluator.deploy(
+    await generalStatementProvider.getAddress()
+  );
+  console.log(
+    await generalStatementEvaluator.getAddress(),
+    "GeneralStatementEvaluator"
+  );
+
+  await generalStatementProvider.addReader(
+    await generalStatementEvaluator.getAddress()
+  );
+
   await assetPriceProvider.addProvider(await kofi.getAddress());
   await footBallScoreProvider.addProvider(await kofi.getAddress());
+  await generalStatementProvider.addProvider(await kofi.getAddress());
 
   await registry.createTopic(
     "Football Outcome Events",
@@ -142,6 +170,11 @@ async function deployChallengePool() {
     "Whether asset price be above or below a given amount",
     await assetPriceTargetEvaluator.getAddress()
   ); // 4
+  await registry.createTopic(
+    "General Statement",
+    "Any and all statements",
+    await generalStatementEvaluator.getAddress()
+  ); // 5
   console.log(
     await assetPriceBoundedEvaluator.getAddress(),
     "assetPriceBoundedEvaluator\n",
@@ -152,7 +185,9 @@ async function deployChallengePool() {
     await footBallOverUnderEvaluator.getAddress(),
     "footBallOverUnderEvaluator\n",
     await footBallOutcomeEvaluator.getAddress(),
-    "footBallOutcomeEvaluator\n"
+    "footBallOutcomeEvaluator\n",
+    await generalStatementEvaluator.getAddress(),
+    "generalStatementEvaluator\n"
   );
 
   const topicIds = {
@@ -161,6 +196,7 @@ async function deployChallengePool() {
     correctScore: 2,
     boundedPrice: 3,
     targetPrice: 4,
+    general: 5,
   };
   // deploy test balls
   const BallsToken = await ethers.getContractFactory("BallsToken");
@@ -216,6 +252,8 @@ async function deployChallengePool() {
     footBallCorrectScoreEvaluator,
     assetPriceBoundedEvaluator,
     assetPriceTargetEvaluator,
+    generalStatementEvaluator,
+    generalStatementProvider,
     ballsToken,
     pool,
     topicIds,
@@ -238,6 +276,7 @@ async function deployCreateChallenges() {
     footBallCorrectScoreEvaluator,
     assetPriceBoundedEvaluator,
     assetPriceTargetEvaluator,
+    generalStatementProvider,
     ballsToken,
     pool,
     topicIds,
@@ -311,12 +350,37 @@ async function deployCreateChallenges() {
     maturity: date,
   };
 
+  const statementId = 101;
+  const statement = "Trump will win!";
+  const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
+  const result = 0;
+  const dataProvided = coder.encode(
+    ["uint256", "string", "uint256", "uint8"],
+    [statementId, statement, maturity, result]
+  );
+  const eventParam6 = coder.encode(["uint256"], [statementId]);
+  await expect(generalStatementProvider.provideData(dataProvided))
+    .to.emit(generalStatementProvider, "GeneralStatementProvided")
+    .withArgs(await owner.getAddress(), statementId, statement, result);
+  const statementData = await generalStatementProvider
+    .connect(kwame)
+    .getData(eventParam6);
+  const [_result2] = coder.decode(["uint256"], statementData);
+
+  expect(_result2).equals(result);
+  const challengeEvent6 = {
+    eventParam: eventParam6,
+    topicId: topicIds.general,
+    maturity,
+  };
+
   const challenges = [
     challengeEvent1,
     challengeEvent2,
     challengeEvent3,
     challengeEvent4,
     challengeEvent5,
+    challengeEvent6,
   ];
 
   const _eventsParams = [];
@@ -366,6 +430,10 @@ async function deployCreateChallenges() {
     footBallCorrectScoreEvaluator,
     assetPriceBoundedEvaluator,
     assetPriceTargetEvaluator,
+    generalStatementProvider,
+    statement,
+    statementId,
+    maturity,
     ballsToken,
     pool,
     topicIds,
@@ -547,6 +615,10 @@ describe("ChallengePool", function () {
         kofi,
         assetPriceProvider,
         footBallScoreProvider,
+        generalStatementProvider,
+        statement,
+        statementId,
+        maturity,
         ballsToken,
         pool,
         stkFee,
@@ -585,6 +657,16 @@ describe("ChallengePool", function () {
         [assetSymbol, date, price]
       );
       await assetPriceProvider.connect(kofi).provideData(param2);
+
+      const dataProvided = coder.encode(
+        ["uint256", "string", "uint256", "uint8"],
+        [statementId, statement, maturity, 1]
+      );
+      await expect(
+        generalStatementProvider.connect(kofi).provideData(dataProvided)
+      )
+        .to.emit(generalStatementProvider, "GeneralStatementProvided")
+        .withArgs(await kofi.getAddress(), statementId, statement, 1);
 
       await expect(pool.connect(kojo).closeChallenge(0))
         .emit(pool, "ClosedChallengePool")
@@ -711,6 +793,10 @@ describe("ChallengePool", function () {
         matchId,
         assetSymbol,
         date,
+        generalStatementProvider,
+        statement,
+        statementId,
+        maturity,
       } = await loadFixture(deployCreateChallenges);
       const kwamePrediction = 2; // no
 
@@ -741,6 +827,16 @@ describe("ChallengePool", function () {
         [assetSymbol, date, price]
       );
       await assetPriceProvider.connect(kofi).provideData(param2);
+
+      const dataProvided = coder.encode(
+        ["uint256", "string", "uint256", "uint8"],
+        [statementId, statement, maturity, 1]
+      );
+      await expect(
+        generalStatementProvider.connect(kofi).provideData(dataProvided)
+      )
+        .to.emit(generalStatementProvider, "GeneralStatementProvided")
+        .withArgs(await kofi.getAddress(), statementId, statement, 1);
 
       await expect(pool.connect(kojo).closeChallenge(0))
         .emit(pool, "ClosedChallengePool")
@@ -765,6 +861,10 @@ describe("ChallengePool", function () {
         matchId,
         assetSymbol,
         date,
+        statementId,
+        statement,
+        generalStatementProvider,
+        maturity,
       } = await loadFixture(deployCreateChallenges);
       const kwamePrediction = 2; // no
 
@@ -795,6 +895,16 @@ describe("ChallengePool", function () {
         [assetSymbol, date, price]
       );
       await assetPriceProvider.connect(kofi).provideData(param2);
+
+      const dataProvided = coder.encode(
+        ["uint256", "string", "uint256", "uint8"],
+        [statementId, statement, maturity, 1]
+      );
+      await expect(
+        generalStatementProvider.connect(kofi).provideData(dataProvided)
+      )
+        .to.emit(generalStatementProvider, "GeneralStatementProvided")
+        .withArgs(await kofi.getAddress(), statementId, statement, 1);
 
       await expect(pool.connect(kojo).closeChallenge(0))
         .emit(pool, "ClosedChallengePool")

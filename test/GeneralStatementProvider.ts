@@ -133,11 +133,11 @@ describe("GeneralStatementProvider", function () {
       const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 4;
       const result = 0;
       const dataRequest = coder.encode(["uint256"], [statementId]);
-      const dataProvide = coder.encode(
+      const dataProvided = coder.encode(
         ["uint256", "string", "uint256", "uint8"],
         [statementId, statement, maturity, result]
       );
-      await expect(provider.provideData(dataProvide))
+      await expect(provider.provideData(dataProvided))
         .to.emit(provider, "GeneralStatementProvided")
         .withArgs(await owner.getAddress(), statementId, statement, result);
       await expect(provider.connect(kwame).requestData(dataRequest))
@@ -169,11 +169,11 @@ describe("GeneralStatementProvider", function () {
       const statement = "Trump will win!";
       const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 4;
       const result = 0;
-      const dataProvide = coder.encode(
+      const dataProvided = coder.encode(
         ["uint256", "string", "uint256", "uint8"],
         [statementId, statement, maturity, result]
       );
-      await expect(provider.connect(kofi).provideData(dataProvide))
+      await expect(provider.connect(kofi).provideData(dataProvided))
         .to.emit(provider, "GeneralStatementProvided")
         .withArgs(await kofi.getAddress(), statementId, statement, result);
     });
@@ -244,12 +244,12 @@ describe("GeneralStatementProvider", function () {
         deployGeneralStatementProvider
       );
       const coder = new ethers.AbiCoder();
-      const statementId = 1;
+      const statementId = 2;
       const statement = "Trump will win!";
-      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 4;
+      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
       const result = 0;
       const dataRequest = coder.encode(["uint256"], [statementId]);
-      const dataProvide = coder.encode(
+      const dataProvided = coder.encode(
         ["uint256", "string", "uint256", "uint8"],
         [statementId, statement, maturity, result]
       );
@@ -258,10 +258,11 @@ describe("GeneralStatementProvider", function () {
         ["uint256", "string", "uint256", "uint8"],
         [statementId, statement, maturity, result2]
       );
-      await expect(provider.provideData(dataProvide))
+      await time.increase(60 * 60 * 3);
+      await expect(provider.provideData(dataProvided))
         .to.emit(provider, "GeneralStatementProvided")
         .withArgs(await owner.getAddress(), statementId, statement, result);
-      await time.increase(60 * 60 * 5);
+      await time.increase(60 * 60 * 25);
       await expect(provider.provideData(param2))
         .to.emit(provider, "GeneralStatementProvided")
         .withArgs(await owner.getAddress(), statementId, statement, result2);

@@ -293,7 +293,7 @@ export async function deployGeneralStatementProviderWithKojoReader() {
 
 export async function deployGeneralStatementEvaluator() {
   const { provider, kofi } = await loadFixture(
-    deployFootballScoreProviderWithKofiProvder
+    deployGeneralStatementProviderWithKofiProvder
   );
 
   const [owner, feeAccount, otherAccount, kojo, kwame] =

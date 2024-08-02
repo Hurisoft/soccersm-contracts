@@ -12,6 +12,7 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
         uint256 matchId;
         uint256 homeScore;
         uint256 awayScore;
+        bool exists;
     }
     mapping(uint256 => MatchScore) private _matchScores;
     constructor() Ownable(msg.sender) {}
@@ -29,7 +30,7 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
     );
 
     function _matchExists(uint256 _matchId) internal view returns (bool) {
-        return _matchScores[_matchId].matchId != 0;
+        return _matchScores[_matchId].exists;
     }
 
     function requestData(
@@ -56,7 +57,7 @@ contract FootballScoreProvider is ITopicDataProvider, DataProviderAccess {
         if (_matchExists(matchId)) {
             revert DataAlreadyProvided();
         }
-        _matchScores[matchId] = MatchScore(matchId, homeScore, awayScore);
+        _matchScores[matchId] = MatchScore(matchId, homeScore, awayScore, true);
         emit FootballScoreProvided(msg.sender, matchId, homeScore, awayScore);
     }
 

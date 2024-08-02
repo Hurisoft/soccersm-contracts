@@ -2,6 +2,8 @@
 pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
+
 import "../interfaces/ITopicDataProvider.sol";
 import "../utils/DataProviderAccess.sol";
 import "../utils/Helpers.sol";
@@ -17,6 +19,7 @@ contract GeneralStatementProvider is
         string statement;
         uint256 maturity;
         IChallengePool.Prediction results;
+        bool exists;
     }
     mapping(uint256 => Statement) private _statements;
     constructor() Ownable(msg.sender) {}
@@ -27,6 +30,7 @@ contract GeneralStatementProvider is
     error InvalidResult();
     error InvalidSubmissionDate(uint256 _date);
     error ModifiedParams(string _paramName);
+    error ZeroStatementId();
 
     event GeneralStatementRequested(
         address indexed _reader,
@@ -42,17 +46,20 @@ contract GeneralStatementProvider is
     function _statementExists(
         uint256 _statementId
     ) internal view returns (bool) {
-        return _statements[_statementId].statementId != 0;
+        return _statements[_statementId].exists;
     }
 
     function requestData(
         bytes calldata _params
     ) external override onlyReader returns (bool) {
+        console.log(msg.sender);
         uint256 statementId = abi.decode(_params, (uint256));
-
+        console.log(statementId);
+        console.log(_statementExists(statementId));
         if (!_statementExists(statementId)) {
             revert InvalidStatementId(statementId);
         }
+        console.log(_statements[statementId].maturity, block.timestamp);
         if (_statements[statementId].maturity < block.timestamp) {
             revert InvalidSubmissionDate(_statements[statementId].maturity);
         }
@@ -72,6 +79,10 @@ contract GeneralStatementProvider is
                 _params,
                 (uint256, string, uint256, IChallengePool.Prediction)
             );
+
+        if (statementId == 0) {
+            revert ZeroStatementId();
+        }
 
         if (_statementExists(statementId)) {
             if (maturity > block.timestamp) {
@@ -102,7 +113,8 @@ contract GeneralStatementProvider is
             statementId,
             statement,
             maturity,
-            results
+            results,
+            true
         );
         emit GeneralStatementProvided(
             msg.sender,

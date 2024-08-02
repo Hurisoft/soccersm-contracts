@@ -5,20 +5,18 @@ import {
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { deployFootBallCorrectScoreEvaluator } from "./fixtures";
+import { deployGeneralStatementEvaluator } from "./fixtures";
 
-
-
-describe("FootBallCorrectScoreEvaluator", function () {
+describe("GeneralStatementEvaluator", function () {
   describe("Deployment", function () {
     it("Should Deploy Pool", async function () {
-      await loadFixture(deployFootBallCorrectScoreEvaluator);
+      await loadFixture(deployGeneralStatementEvaluator);
     });
   });
   describe("Set Data Provider", function () {
     it("Should Set Data Provider", async function () {
       const { provider, evaluator } = await loadFixture(
-        deployFootBallCorrectScoreEvaluator
+        deployGeneralStatementEvaluator
       );
       await expect(evaluator.setDataProvider(provider))
         .to.emit(evaluator, "NewDataProvider")
@@ -26,7 +24,7 @@ describe("FootBallCorrectScoreEvaluator", function () {
     });
     it("Should Fail to Set Data Provider", async function () {
       const { provider, evaluator, kwame } = await loadFixture(
-        deployFootBallCorrectScoreEvaluator
+        deployGeneralStatementEvaluator
       );
       expect(evaluator.connect(kwame).setDataProvider(provider))
         .to.revertedWithCustomError(evaluator, "OwnableUnauthorizedAccount")
@@ -36,41 +34,39 @@ describe("FootBallCorrectScoreEvaluator", function () {
   describe("Validate Event", function () {
     it("Should Validate Event", async function () {
       const { provider, evaluator } = await loadFixture(
-        deployFootBallCorrectScoreEvaluator
+        deployGeneralStatementEvaluator
       );
       const coder = new ethers.AbiCoder();
-      const matchId = 1;
-      const predictedHomeScore = 3;
-      const predictedAwayScore = 4;
-      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
-      const eventParam = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, predictedHomeScore, predictedAwayScore]
-      );
+      const statementId = 1;
+      const statement = "Trump will win!";
+      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 4;
       const result = 0;
+      const eventParam = coder.encode(
+        ["uint256"],
+        [statementId]
+      );
       const challengeEvent = { eventParam, topicId: 1, maturity, result };
       const a = await evaluator.validateEvent(challengeEvent);
     });
     it("Should fail to Validate Event", async function () {
       const { provider, evaluator, kwame } = await loadFixture(
-        deployFootBallCorrectScoreEvaluator
+        deployGeneralStatementEvaluator
       );
       const coder = new ethers.AbiCoder();
-      const matchId = 1;
-      const predictedHomeScore = 3;
-      const predictedAwayScore = 4;
-      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
-      const eventParam = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, predictedHomeScore, predictedAwayScore]
-      );
+      const statementId = 1;
+      const statement = "Trump will win!";
+      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 4;
       const result = 0;
+      const eventParam = coder.encode(
+        ["uint256"],
+        [statementId]
+      );
       const challengeEvent = { eventParam, topicId: 1, maturity, result };
-      await evaluator.validateEvent(challengeEvent);
+      const a = await evaluator.validateEvent(challengeEvent);
       await provider.removeReader(await evaluator.getAddress());
       challengeEvent.eventParam = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, predictedHomeScore, predictedAwayScore]
+        ["uint256"],
+        [statementId]
       );
       await evaluator.validateEvent(challengeEvent);
     });
@@ -78,61 +74,58 @@ describe("FootBallCorrectScoreEvaluator", function () {
   describe("Evaluate Event", function () {
     it("Should Evaluate Event", async function () {
       const { provider, evaluator, kofi } = await loadFixture(
-        deployFootBallCorrectScoreEvaluator
+        deployGeneralStatementEvaluator
       );
       const coder = new ethers.AbiCoder();
-      const matchId = 1;
-      const homeScore = 1;
-      const awayScore = 2;
-      const predictedHomeScore = 1;
-      const predictedAwayScore = 2;
+      const statementId = 1;
+      const statement = "Trump will win!";
+      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 4;
+      const result = 0;
       const param = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, homeScore, awayScore]
+        ["uint256", "string", "uint256", "uint8"],
+        [statementId, statement, maturity, result]
       );
       await provider.connect(kofi).provideData(param);
-      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
+      const maturity2 = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
       const eventParam = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, predictedHomeScore, predictedAwayScore]
+        ["uint256"],
+        [statementId]
       );
-      const result = 0;
-      const challengeEvent = { eventParam, topicId: 1, maturity, result };
+      const result2 = 0;
+      const challengeEvent = {
+        eventParam,
+        topicId: 1,
+        maturity,
+        result: result2,
+      };
       await evaluator.evaluateEvent(challengeEvent);
     });
     it("Should fail to Evaluate Event", async function () {
       const { provider, evaluator, kofi } = await loadFixture(
-        deployFootBallCorrectScoreEvaluator
+        deployGeneralStatementEvaluator
       );
       const coder = new ethers.AbiCoder();
-      const matchId = 1;
-      const homeScore = 2;
-      const awayScore = 2;
-      const predictedHomeScore = 3;
-      const predictedAwayScore = 4;
+      const statementId = 1;
+      const statement = "Trump will win!";
+      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 4;
+      const result = 0;
       const param = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, homeScore, awayScore]
+        ["uint256", "string", "uint256", "uint8"],
+        [statementId, statement, maturity, result]
       );
       await provider.connect(kofi).provideData(param);
-      const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
+      const maturity2 = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
       const eventParam = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, predictedHomeScore, predictedAwayScore]
+        ["uint256", "string", "uint256", "uint8"],
+        [statementId, statement, maturity2, result]
       );
-      const result = 0;
-      const challengeEvent = { eventParam, topicId: 1, maturity, result };
-      await evaluator.evaluateEvent(challengeEvent);
-      challengeEvent.eventParam = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [0, predictedHomeScore, predictedAwayScore]
-      );
-      await evaluator.evaluateEvent(challengeEvent);
-      await provider.removeReader(await evaluator.getAddress());
-      challengeEvent.eventParam = coder.encode(
-        ["uint256", "uint256", "uint256"],
-        [matchId, predictedHomeScore, predictedAwayScore]
-      );
+      const result2 = 0;
+      const challengeEvent = {
+        eventParam,
+        topicId: 1,
+        maturity,
+        result: result2,
+      };
       await evaluator.evaluateEvent(challengeEvent);
     });
   });

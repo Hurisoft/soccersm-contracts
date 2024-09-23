@@ -80,6 +80,11 @@ Url - https://explorer-holesky.morphl2.io/address/0x165a2B4F2e9C6c85D545c34aE3f0
 Deploy - `npx hardhat run scripts/deploy_general_statement_provider.ts --network morphTestnet`
 Verify - `npx hardhat verify [FOOTBALL_SCORE_PROVIDER] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0x3462AA899f5b0ba0b908f82EEbE2D2969EC44A1c
+
+##### Multi Provider
+Deploy - `npx hardhat run scripts/deploy_multi_provider.ts --network morphTestnet`
+Verify - `npx hardhat verify [MULTI_PROVIDER] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0xf59EC49749696E910a06eB87c24f723e97D6484d
 #### Deploy Evaluators
 
 ##### Football Outcome Evaluator

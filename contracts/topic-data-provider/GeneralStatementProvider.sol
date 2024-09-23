@@ -2,8 +2,6 @@
 pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
-
 import "../interfaces/ITopicDataProvider.sol";
 import "../utils/DataProviderAccess.sol";
 import "../utils/Helpers.sol";
@@ -52,14 +50,10 @@ contract GeneralStatementProvider is
     function requestData(
         bytes calldata _params
     ) external override onlyReader returns (bool) {
-        console.log(msg.sender);
         uint256 statementId = abi.decode(_params, (uint256));
-        console.log(statementId);
-        console.log(_statementExists(statementId));
         if (!_statementExists(statementId)) {
             revert InvalidStatementId(statementId);
         }
-        console.log(_statements[statementId].maturity, block.timestamp);
         if (_statements[statementId].maturity < block.timestamp) {
             revert InvalidSubmissionDate(_statements[statementId].maturity);
         }

@@ -3,7 +3,9 @@ const ONE_DAY = ONE_HOUR * 24;
 const ONE_WEEK = ONE_DAY * 7;
 
 const poolFee = 10;
-const joinPeriod = 9000;
+const poolJoinFee = 30;
+const poolCreateFee = 50;
+const joinPeriod = 10000;
 const maxMaturityPeriod = ONE_WEEK * 12;
 const maxPlayersPerPool = 100;
 const minStakeAmount = BigInt(100 * 1e18);

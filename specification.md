@@ -239,3 +239,26 @@ The core of challenge pools is powered by a collections of contracts, oracles an
 - `createRaffle`
 - `joinRaffle`
 - `withdrawWinnings`
+
+## Multipool Specification
+
+- This pool allows for multiple answers beyond just yes and no. There is one questions and multiple answers of which users can stake on only one of them.
+It is simply an extension of the yes/no challenge pool.
+
+### Tickets
+
+- Tickets are digital tokens that are transfered to an address for participating in a pool. It is not a full NFT but mostly behaves like it. It can be transfered from one holder to another. So there is a possible secondary market.
+
+When a user is staking on a pool they can purchase as many tickets as possible and the number of tickets is unlimited. The price of tickets remain constant through out the entire period of the pool. 
+
+- This is a simplistic model that would definitely be improved upon. In the future the price of tickets will depend on the probability of the chosen outcome, the base price and the time left to closing the pool.
+
+### Contract
+
+- Multipool contract is different from the yes/no pool contract. It has two different pool fees and different call parameters for join and create pool.
+
+#### Protocol Variables
+
+- `createPoolFee` - percentage of stake to be charged as pool fee when creating a pool
+
+- `joinPoolFee` - percentage of stake to be charged as pool fee when joining a pool

@@ -7,7 +7,7 @@ import "../utils/DataProviderAccess.sol";
 import "../utils/Helpers.sol";
 import "../interfaces/IChallengePool.sol";
 
-contract GeneralStatementProvider is
+contract MultiGeneralStatementProvider is
     ITopicDataProvider,
     DataProviderAccess,
     Helpers

@@ -247,7 +247,7 @@ It is simply an extension of the yes/no challenge pool.
 
 ### Tickets
 
-- Tickets are digital tokens that are transfered to an address for participating in a pool. It is not a full NFT but mostly behaves like it. It can be transfered from one holder to another. So there is a possible secondary market.
+- Tickets are digital tokens that are transfered to an address for participating in a pool. It has support for NFT interface with a few extra conditionals.
 
 When a user is staking on a pool they can purchase as many tickets as possible and the number of tickets is unlimited. The price of tickets remain constant through out the entire period of the pool. 
 

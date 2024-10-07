@@ -139,11 +139,11 @@ abstract contract IMultiChallengePool is Helpers {
     error ProtocolInvariantCheckFailed();
     error NextStalePoolRetryNotReached(uint256 _curentRetry);
     error UserLacksBalls();
-    error InvalidEventTopic();
-    error InvalidEventParam();
-    error InvalidEventMaturity(uint256 _timeDiff);
+    error InvalidPollTopic();
+    error InvalidPollParam();
+    error InvalidPollMaturity(uint256 _timeDiff);
     error InvalidOptionsLength();
-    error InvalidEventOption();
+    error InvalidPollOption();
 
     modifier validChallenge(uint256 _challengeId) {
         if (_challengeId >= challengePools.length) {
@@ -306,25 +306,25 @@ abstract contract IMultiChallengePool is Helpers {
             revert InvalidOptionsLength();
         }
         if (_pollMaturity < (block.timestamp + minMaturityPeriod)) {
-            revert InvalidEventMaturity(
+            revert InvalidPollMaturity(
                 (block.timestamp + minMaturityPeriod) - _pollMaturity
             );
         }
         if (!_activeTopic(_pollTopicId)) {
-            revert InvalidEventTopic();
+            revert InvalidPollTopic();
         }
         uint256 stake = _ticketQuantity * _stake;
         uint256 fee = _computeCreateFee(stake);
         _senderHasBalls(stake + fee);
         uint256 challengeId = challengePools.length;
-        Poll memory poll = new Poll(
+        Poll memory poll = Poll(
             _pollParam,
             _pollTopicId,
             _pollMaturity,
             _pollOptions
         );
-        if (!_topicEvaluator(poll.topicId).validateEvent(poll)) {
-            revert InvalidEventParam();
+        if (!_topicEvaluator(poll.topicId).validatePoll(poll)) {
+            revert InvalidPollParam();
         }
         bool _userPredictionValid = false;
         for (uint256 i = 0; i < _pollOptions.length; i++) {
@@ -390,7 +390,7 @@ abstract contract IMultiChallengePool is Helpers {
         if (!optionTickets[_challengeId][_userPrediction].isOption) {
             revert InvalidPrediction();
         }
-        if (!tickets[msg.sender][_challengeId].quantity > 0) {
+        if (!(tickets[msg.sender][_challengeId].quantity > 0)) {
             revert PlayerAlreadyInPool();
         }
         Challenge storage challenge = challengePools[_challengeId];
@@ -411,7 +411,7 @@ abstract contract IMultiChallengePool is Helpers {
         );
         challenge.totalParticipants += 1;
         challenge.totalTickets += _ticketQuantity;
-        optionTickets[_challengeId][_userPrediction] += _ticketQuantity;
+        optionTickets[_challengeId][_userPrediction].totalSupply += _ticketQuantity;
         accumulatedFee += fee;
         _deposit(_stake + fee);
         emit JoinChallengePool(
@@ -448,8 +448,8 @@ abstract contract IMultiChallengePool is Helpers {
                 return;
             }
         }
-        bytes memory evaluation = _topicEvaluator(challenge.topicId)
-            .evaluateEvent(challenge.poll);
+        bytes memory evaluation = _topicEvaluator(challenge.poll.topicId)
+            .evaluatePoll(challenge.poll);
         if (compareBytes(evaluation, emptyBytes)) {
             challenge.staleRetries += 1;
             challenge.state = PoolState.stale;
@@ -554,10 +554,10 @@ abstract contract IMultiChallengePool is Helpers {
             return 0;
         }
 
-        if (tickets[_participant][_challengeId] != challenge.result) {
+        if (!compareBytes(tickets[_participant][_challengeId].choice, challenge.result)) {
             return 0;
         }
-        winShare = _computeWinnerShare(challenge);
+        winShare = _computeWinnerShare(challenge, _challengeId);
     }
 
     function stakeAmountAndFee(uint256 _stake) public view returns (uint256) {
@@ -680,7 +680,7 @@ abstract contract IMultiChallengePool is Helpers {
         uint256 amount
     ) internal isTicketWithdrawn(from, id) isTicketWithdrawn(to, id) {
         Ticket storage senderTicket = tickets[from][id];
-        Ticket storage receiverTicket = [to][id];
+        Ticket storage receiverTicket = tickets[to][id];
         if (senderTicket.quantity < amount) {
             revert InsufficientBalance(from, id);
         }

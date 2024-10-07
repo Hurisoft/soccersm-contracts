@@ -9,7 +9,7 @@ import "../utils/Helpers.sol";
 
 abstract contract IMultiEvaluator is EvaluatorAccess, Helpers {
     constructor(address _dataProvider) EvaluatorAccess(_dataProvider) {}
-    function evaluateEvent(
+    function evaluatePoll(
         IMultiChallengePool.Poll calldata _poll
     ) external returns (bytes memory) {
         try this.decodeAndAnswer(_poll) returns (bytes memory k) {
@@ -19,7 +19,7 @@ abstract contract IMultiEvaluator is EvaluatorAccess, Helpers {
         }
     }
 
-    function validateEvent(
+    function validatePoll(
         IMultiChallengePool.Poll calldata _poll
     ) external returns (bool) {
         try this.decodeAndAskProvider(_poll) returns (bool k) {

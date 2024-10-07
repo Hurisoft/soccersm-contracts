@@ -22,7 +22,7 @@ abstract contract Helpers {
     }
 
     modifier nonZero(uint256 num) {
-        if(num == 0) {
+        if (num == 0) {
             revert ZeroNumber();
         }
         _;
@@ -44,5 +44,14 @@ abstract contract Helpers {
     ) internal pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) ==
             keccak256(abi.encodePacked((b))));
+    }
+    function compareBytes(
+        bytes memory _bytes1,
+        bytes memory _bytes2
+    ) internal pure returns (bool) {
+        if (_bytes1.length != _bytes2.length) {
+            return false;
+        }
+        return keccak256(_bytes1) == keccak256(_bytes2);
     }
 }

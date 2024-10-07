@@ -203,6 +203,8 @@ abstract contract IChallengePool is Helpers {
         uint256 _staleExtensionTime
     ) external virtual;
 
+    function withdrawFees() external virtual;
+
     // ============= INTERNAL =================
 
     function _computeDeadline(

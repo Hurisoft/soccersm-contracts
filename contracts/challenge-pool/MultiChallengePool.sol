@@ -3,11 +3,12 @@ pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../interfaces/IMultiChallengePool.sol";
 import "../interfaces/IMultiTopicRegistry.sol";
-import "../interfaces/IEvaluator.sol";
 
-contract ChallengePool is IMultiChallengePool, Ownable {
+contract MultiChallengePool is IMultiChallengePool, Ownable {
     constructor(
         uint256 _joinPoolFee,
         uint256 _createPoolFee,
@@ -99,15 +100,21 @@ contract ChallengePool is IMultiChallengePool, Ownable {
         maxStaleRetries = _maxStaleRetries;
     }
 
-    function setStaleExtensionTime(
+    function setMaxOptionsPerPool(
         uint256 _staleExtensionPeriod
     ) external override onlyOwner {
         staleExtensionPeriod = _staleExtensionPeriod;
     }
 
+    function setStaleExtensionTime(
+        uint256 _maxOptionsPerPool
+    ) external override onlyOwner {
+        maxOptionsPerPool = _maxOptionsPerPool;
+    }
+
     function closeFromManual(
         uint256 _challengeId,
-        bytes _manualResult
+        bytes calldata _manualResult
     )
         external
         override
@@ -140,5 +147,11 @@ contract ChallengePool is IMultiChallengePool, Ownable {
         }
         challenge.state = PoolState.cancelled;
         emit CancelChallengePool(_challengeId, msg.sender, challenge.state);
+    }
+
+    function withdrawFees() external override onlyOwner {
+        uint256 amount = accumulatedFee;
+        accumulatedFee = 0;
+        SafeERC20.safeTransfer(balls, feeAddress, amount);
     }
 }

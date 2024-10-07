@@ -19,8 +19,8 @@ abstract contract IMultiChallengePool is Helpers {
         mature
     }
 
-    struct ChallengeEvent {
-        bytes eventParam;
+    struct Poll {
+        bytes pollParam;
         uint256 topicId;
         uint256 maturity;
         bytes[] options;
@@ -35,7 +35,7 @@ abstract contract IMultiChallengePool is Helpers {
         bytes result;
         uint256 totalParticipants;
         uint256 totalTickets;
-        ChallengeEvent challengeEvent;
+        Poll poll;
     }
 
     struct Ticket {
@@ -46,7 +46,7 @@ abstract contract IMultiChallengePool is Helpers {
 
     struct OptionTicket {
         bool isOption;
-        uint256 tickets;
+        uint256 totalSupply;
     }
 
     // ============ protocol variables =============
@@ -85,7 +85,7 @@ abstract contract IMultiChallengePool is Helpers {
         uint256 fee,
         uint256 totalParticipants,
         uint256 totalTickets,
-        ChallengeEvent challengeEvent
+        Poll poll
     );
     event ClosedChallengePool(
         uint256 indexed challengeId,
@@ -167,8 +167,8 @@ abstract contract IMultiChallengePool is Helpers {
         _;
     }
 
-    modifier validPrediction(bytes _prediction) {
-        if (_prediction == emptyBytes) {
+    modifier validPrediction(bytes memory _prediction) {
+        if (compareBytes(_prediction, emptyBytes)) {
             revert InvalidPrediction();
         }
         _;
@@ -184,7 +184,7 @@ abstract contract IMultiChallengePool is Helpers {
 
     function setCreatePoolFee(uint256 _createPoolFee) external virtual;
 
-    function setJoolFee(uint256 _joinPoolFee) external virtual;
+    function setJoinPoolFee(uint256 _joinPoolFee) external virtual;
 
     function setMaxOptionsPerPool(uint256 _maxOptionsPerPool) external virtual;
 
@@ -203,6 +203,8 @@ abstract contract IMultiChallengePool is Helpers {
     function setStaleExtensionTime(
         uint256 _staleExtensionTime
     ) external virtual;
+
+    function withdrawFees() external virtual;
 
     // ============= INTERNAL =================
 
@@ -230,7 +232,7 @@ abstract contract IMultiChallengePool is Helpers {
         uint256 _challengeId
     ) internal view returns (uint256) {
         uint256 winners = optionTickets[_challengeId][_challenge.result]
-            .tickets;
+            .totalSupply;
         uint256 loosers = _challenge.totalTickets - winners;
         return Math.mulDiv(_challenge.stake, loosers, winners);
     }
@@ -239,10 +241,10 @@ abstract contract IMultiChallengePool is Helpers {
         Challenge storage _challenge
     ) internal view returns (PoolState) {
         if (_challenge.state == PoolState.open) {
-            if (block.timestamp >= _challenge.maturity) {
+            if (block.timestamp >= _challenge.poll.maturity) {
                 return PoolState.mature;
             }
-            if (block.timestamp >= _challenge.challengeEvent.maturity) {
+            if (block.timestamp >= _challenge.poll.maturity) {
                 return PoolState.locked;
             }
             return _challenge.state;
@@ -292,45 +294,41 @@ abstract contract IMultiChallengePool is Helpers {
     // ============= EXTERNAL STATE =================
 
     function createChallenge(
-        bytes _eventParam,
-        uint256 calldata _eventTopicId,
-        uint256 calldata _eventMaturity,
-        bytes[] calldata _eventOptions,
+        bytes calldata _pollParam,
+        uint256 _pollTopicId,
+        uint256 _pollMaturity,
+        bytes[] calldata _pollOptions,
         bytes calldata _userPrediction,
         uint256 _ticketQuantity,
         uint256 _stake
     ) external nonZero(_ticketQuantity) nonZero(_stake) {
-        if (_eventOptions.length > maxOptionsPerPool) {
+        if (_pollOptions.length > maxOptionsPerPool) {
             revert InvalidOptionsLength();
         }
-        if (_eventMaturity < (block.timestamp + minMaturityPeriod)) {
+        if (_pollMaturity < (block.timestamp + minMaturityPeriod)) {
             revert InvalidEventMaturity(
-                (block.timestamp + minMaturityPeriod) - _eventMaturity
+                (block.timestamp + minMaturityPeriod) - _pollMaturity
             );
         }
-        if (!_activeTopic(_eventTopicId)) {
+        if (!_activeTopic(_pollTopicId)) {
             revert InvalidEventTopic();
         }
         uint256 stake = _ticketQuantity * _stake;
         uint256 fee = _computeCreateFee(stake);
         _senderHasBalls(stake + fee);
         uint256 challengeId = challengePools.length;
-        ChallengeEvent memory challengeEvent = new ChallengeEvent(
-            _eventParam,
-            _eventTopicId,
-            _eventMaturity,
-            _eventOptions
+        Poll memory poll = new Poll(
+            _pollParam,
+            _pollTopicId,
+            _pollMaturity,
+            _pollOptions
         );
-        if (
-            !_topicEvaluator(challengeEvent.topicId).validateEvent(
-                challengeEvent
-            )
-        ) {
+        if (!_topicEvaluator(poll.topicId).validateEvent(poll)) {
             revert InvalidEventParam();
         }
         bool _userPredictionValid = false;
-        for (uint256 i = 0; i < _eventOptions.length; i++) {
-            if (_userPrediction == _eventOptions[i] && !_userPredictionValid) {
+        for (uint256 i = 0; i < _pollOptions.length; i++) {
+            if (compareBytes(_userPrediction, _pollOptions[i]) && !_userPredictionValid) {
                 optionTickets[challengeId][_userPrediction] = OptionTicket(
                     true,
                     _ticketQuantity
@@ -358,21 +356,21 @@ abstract contract IMultiChallengePool is Helpers {
             Challenge(
                 _stake,
                 block.timestamp,
-                _eventMaturity,
+                _pollMaturity,
                 0,
                 PoolState.open,
                 emptyBytes,
                 1,
                 _ticketQuantity,
-                challengeEvent
+                poll
             )
         );
         emit NewChallengePool(
             challengeId,
             msg.sender,
             block.timestamp,
-            _eventMaturity,
-            _eventMaturity,
+            _pollMaturity,
+            _pollMaturity,
             0,
             PoolState.open,
             emptyBytes,
@@ -380,13 +378,13 @@ abstract contract IMultiChallengePool is Helpers {
             fee,
             1,
             _ticketQuantity,
-            challengeEvent
+            poll
         );
     }
 
     function joinChallenge(
         uint256 _challengeId,
-        bytes _userPrediction,
+        bytes calldata _userPrediction,
         uint256 _ticketQuantity
     ) external validChallenge(_challengeId) nonZero(_ticketQuantity) {
         if (!optionTickets[_challengeId][_userPrediction].isOption) {
@@ -450,10 +448,9 @@ abstract contract IMultiChallengePool is Helpers {
                 return;
             }
         }
-        bytes evaluation = _topicEvaluator(challenge.topicId).evaluateEvent(
-            challenge.challengeEvent
-        );
-        if (evaluation == emptyBytes) {
+        bytes memory evaluation = _topicEvaluator(challenge.topicId)
+            .evaluateEvent(challenge.poll);
+        if (compareBytes(evaluation, emptyBytes)) {
             challenge.staleRetries += 1;
             challenge.state = PoolState.stale;
             challenge.nextCloseTime = block.timestamp + staleExtensionPeriod;
@@ -509,7 +506,7 @@ abstract contract IMultiChallengePool is Helpers {
 
     function closeFromManual(
         uint256 _challengeId,
-        bytes _manualPrediction
+        bytes calldata _manualPrediction
     ) external virtual;
 
     function cancelFromManual(uint256 _challengeId) external virtual;
@@ -531,7 +528,7 @@ abstract contract IMultiChallengePool is Helpers {
         if (playerTicket.quantity == 0) {
             revert PlayerNotInPool();
         }
-        if (playerTicket.choice != challenge.result) {
+        if (!compareBytes(playerTicket.choice, challenge.result)) {
             revert PlayerDidNotWinPool();
         }
         winShare = _computeWinnerShare(challenge, _challengeId);
@@ -551,7 +548,9 @@ abstract contract IMultiChallengePool is Helpers {
         ) {
             revert ActionNotAllowedForState(currentState);
         }
-        if (tickets[_participant][_challengeId].choice == emptyBytes) {
+        if (
+            compareBytes(tickets[_participant][_challengeId].choice, emptyBytes)
+        ) {
             return 0;
         }
 
@@ -576,7 +575,7 @@ abstract contract IMultiChallengePool is Helpers {
     function challengeDeadline(
         uint256 _challengeId
     ) external view validChallenge(_challengeId) returns (uint256) {
-        return challengePools[_challengeId].challengeEvent.maturity;
+        return challengePools[_challengeId].poll.maturity;
     }
 
     function challengeState(
@@ -589,5 +588,178 @@ abstract contract IMultiChallengePool is Helpers {
         uint256 _challengeId
     ) external view returns (Challenge memory) {
         return challengePools[_challengeId];
+    }
+
+    // NFT Support
+
+    /// @dev Thrown when owner balance for id is insufficient.
+    /// @param owner The address of the owner.
+    /// @param id The id of the token.
+    error InsufficientBalance(address owner, uint256 id);
+
+    /// @dev Thrown when spender allowance for id is insufficient.
+    /// @param spender The address of the spender.
+    /// @param id The id of the token.
+    error InsufficientPermission(address spender, uint256 id);
+
+    error TicketWithdrawn(address owner, uint256 id);
+
+    error IncompatibleTicketChoices(address from, address to, uint256 id);
+
+    /// @notice The event emitted when a transfer occurs.
+    /// @param sender The address of the sender.
+    /// @param receiver The address of the receiver.
+    /// @param id The id of the token.
+    /// @param amount The amount of the token.
+    event Transfer(
+        address caller,
+        address indexed sender,
+        address indexed receiver,
+        uint256 indexed id,
+        uint256 amount
+    );
+
+    /// @notice The event emitted when an operator is set.
+    /// @param owner The address of the owner.
+    /// @param spender The address of the spender.
+    /// @param approved The approval status.
+    event OperatorSet(
+        address indexed owner,
+        address indexed spender,
+        bool approved
+    );
+
+    /// @notice The event emitted when an approval occurs.
+    /// @param owner The address of the owner.
+    /// @param spender The address of the spender.
+    /// @param id The id of the token.
+    /// @param amount The amount of the token.
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 indexed id,
+        uint256 amount
+    );
+
+    /// @notice Spender allowance of an id.
+    mapping(address owner => mapping(address spender => mapping(uint256 id => uint256 amount)))
+        public allowance;
+
+    /// @notice Checks if a spender is approved by an owner as an operator.
+    mapping(address owner => mapping(address spender => bool))
+        public isOperator;
+
+    modifier isTicketWithdrawn(address owner, uint256 id) {
+        if (tickets[owner][id].withdrawn) {
+            revert TicketWithdrawn(owner, id);
+        }
+        _;
+    }
+
+    /// balanceOf interfeace is represented with a public view function
+
+    function balanceOf(
+        address owner,
+        uint256 id
+    ) public view returns (uint256) {
+        return tickets[owner][id].quantity;
+    }
+
+    /// totalSupply interfeace is represented with a public view function
+
+    function totalSupply(
+        uint256 id
+    ) public view validChallenge(id) returns (uint256) {
+        return challengePools[id].totalTickets;
+    }
+
+    function _transferTicket(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount
+    ) internal isTicketWithdrawn(from, id) isTicketWithdrawn(to, id) {
+        Ticket storage senderTicket = tickets[from][id];
+        Ticket storage receiverTicket = [to][id];
+        if (senderTicket.quantity < amount) {
+            revert InsufficientBalance(from, id);
+        }
+        if (
+            receiverTicket.quantity > 0 &&
+            !compareBytes(senderTicket.choice, receiverTicket.choice)
+        ) {
+            revert IncompatibleTicketChoices(from, to, id);
+        }
+        senderTicket.quantity -= amount;
+        receiverTicket.quantity += amount;
+        emit Transfer(msg.sender, from, to, id, amount);
+    }
+
+    /// @notice Transfers an amount of an id from the caller to a receiver.
+    /// @param receiver The address of the receiver.
+    /// @param id The id of the token.
+    /// @param amount The amount of the token.
+    function transfer(
+        address receiver,
+        uint256 id,
+        uint256 amount
+    ) public returns (bool) {
+        _transferTicket(msg.sender, receiver, id, amount);
+        return true;
+    }
+
+    /// @notice Transfers an amount of an id from a sender to a receiver.
+    /// @param sender The address of the sender.
+    /// @param receiver The address of the receiver.
+    /// @param id The id of the token.
+    /// @param amount The amount of the token.
+    function transferFrom(
+        address sender,
+        address receiver,
+        uint256 id,
+        uint256 amount
+    ) public returns (bool) {
+        if (sender != msg.sender && !isOperator[sender][msg.sender]) {
+            uint256 senderAllowance = allowance[sender][msg.sender][id];
+            if (senderAllowance < amount)
+                revert InsufficientPermission(msg.sender, id);
+            if (senderAllowance != type(uint256).max) {
+                allowance[sender][msg.sender][id] = senderAllowance - amount;
+            }
+        }
+        _transferTicket(sender, receiver, id, amount);
+        return true;
+    }
+
+    /// @notice Approves an amount of an id to a spender.
+    /// @param spender The address of the spender.
+    /// @param id The id of the token.
+    /// @param amount The amount of the token.
+    function approve(
+        address spender,
+        uint256 id,
+        uint256 amount
+    ) public returns (bool) {
+        allowance[msg.sender][spender][id] = amount;
+        emit Approval(msg.sender, spender, id, amount);
+        return true;
+    }
+
+    /// @notice Sets or removes a spender as an operator for the caller.
+    /// @param spender The address of the spender.
+    /// @param approved The approval status.
+    function setOperator(address spender, bool approved) public returns (bool) {
+        isOperator[msg.sender][spender] = approved;
+        emit OperatorSet(msg.sender, spender, approved);
+        return true;
+    }
+
+    /// @notice Checks if a contract implements an interface.
+    /// @param interfaceId The interface identifier, as specified in ERC-165.
+    /// @return supported True if the contract implements `interfaceId`.
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public pure returns (bool supported) {
+        return interfaceId == 0x0f632fb3 || interfaceId == 0x01ffc9a7;
     }
 }

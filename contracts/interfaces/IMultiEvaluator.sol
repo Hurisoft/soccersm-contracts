@@ -5,22 +5,24 @@ import "./ITopicDataProvider.sol";
 
 import "../utils/EvaluatorAccess.sol";
 
-abstract contract IMultiEvaluator is EvaluatorAccess {
+import "../utils/Helpers.sol";
+
+abstract contract IMultiEvaluator is EvaluatorAccess, Helpers {
     constructor(address _dataProvider) EvaluatorAccess(_dataProvider) {}
     function evaluateEvent(
-        IMultiChallengePool.ChallengeEvent calldata _challengeEvent
-    ) external returns (bytes) {
-        try this.decodeAndAnswer(_challengeEvent) returns (bytes k) {
+        IMultiChallengePool.Poll calldata _poll
+    ) external returns (bytes memory) {
+        try this.decodeAndAnswer(_poll) returns (bytes memory k) {
             return k;
         } catch {
-            return IMultiChallengePool.Prediction.zero;
+            return emptyBytes;
         }
     }
 
     function validateEvent(
-        IMultiChallengePool.ChallengeEvent calldata _challengeEvent
+        IMultiChallengePool.Poll calldata _poll
     ) external returns (bool) {
-        try this.decodeAndAskProvider(_challengeEvent) returns (bool k) {
+        try this.decodeAndAskProvider(_poll) returns (bool k) {
             return k;
         } catch {
             return false;
@@ -28,12 +30,12 @@ abstract contract IMultiEvaluator is EvaluatorAccess {
     }
 
     function decodeAndAskProvider(
-        IMultiChallengePool.ChallengeEvent calldata _challengeEvent
+        IMultiChallengePool.Poll calldata _poll
     ) external virtual returns (bool);
 
     function decodeAndAnswer(
-        IMultiChallengePool.ChallengeEvent calldata _challengeEvent
-    ) external virtual returns (bytes);
+        IMultiChallengePool.Poll calldata _poll
+    ) external virtual returns (bytes memory);
 
     function dataProvider() public view returns (ITopicDataProvider) {
         return evaluatorDataProvider;

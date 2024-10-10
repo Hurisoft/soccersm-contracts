@@ -8,6 +8,8 @@ import "./IMultiTopicRegistry.sol";
 import "./IMultiEvaluator.sol";
 import "../utils/Helpers.sol";
 
+// import "hardhat/console.sol";
+
 abstract contract IMultiChallengePool is Helpers {
     enum PoolState {
         open,
@@ -300,8 +302,8 @@ abstract contract IMultiChallengePool is Helpers {
         bytes[] calldata _pollOptions,
         bytes calldata _userPrediction,
         uint256 _ticketQuantity,
-        uint256 _stake
-    ) external nonZero(_ticketQuantity) nonZero(_stake) {
+        uint256 _poolStake
+    ) external nonZero(_ticketQuantity) validStake(_poolStake) {
         if (_pollOptions.length > maxOptionsPerPool) {
             revert InvalidOptionsLength();
         }
@@ -313,7 +315,7 @@ abstract contract IMultiChallengePool is Helpers {
         if (!_activeTopic(_pollTopicId)) {
             revert InvalidPollTopic();
         }
-        uint256 stake = _ticketQuantity * _stake;
+        uint256 stake = _ticketQuantity * _poolStake;
         uint256 fee = _computeCreateFee(stake);
         _senderHasBalls(stake + fee);
         uint256 challengeId = challengePools.length;
@@ -326,16 +328,22 @@ abstract contract IMultiChallengePool is Helpers {
         if (!_topicEvaluator(poll.topicId).validatePoll(poll)) {
             revert InvalidPollParam();
         }
+        if (compareBytes(_userPrediction, emptyBytes)) {
+            revert InvalidPrediction();
+        }
         bool _userPredictionValid = false;
         for (uint256 i = 0; i < _pollOptions.length; i++) {
-            if (compareBytes(_userPrediction, _pollOptions[i]) && !_userPredictionValid) {
-                optionTickets[challengeId][_userPrediction] = OptionTicket(
+            if (
+                compareBytes(_userPrediction, _pollOptions[i]) &&
+                !_userPredictionValid
+            ) {
+                optionTickets[challengeId][_pollOptions[i]] = OptionTicket(
                     true,
                     _ticketQuantity
                 );
                 _userPredictionValid = true;
             } else {
-                optionTickets[challengeId][_userPrediction] = OptionTicket(
+                optionTickets[challengeId][_pollOptions[i]] = OptionTicket(
                     true,
                     0
                 );
@@ -354,7 +362,7 @@ abstract contract IMultiChallengePool is Helpers {
         _deposit(stake + fee);
         challengePools.push(
             Challenge(
-                _stake,
+                _poolStake,
                 block.timestamp,
                 _pollMaturity,
                 0,
@@ -374,7 +382,7 @@ abstract contract IMultiChallengePool is Helpers {
             0,
             PoolState.open,
             emptyBytes,
-            _stake,
+            _poolStake,
             fee,
             1,
             _ticketQuantity,
@@ -390,7 +398,8 @@ abstract contract IMultiChallengePool is Helpers {
         if (!optionTickets[_challengeId][_userPrediction].isOption) {
             revert InvalidPrediction();
         }
-        if (!(tickets[msg.sender][_challengeId].quantity > 0)) {
+        if
+         (tickets[msg.sender][_challengeId].quantity > 0) {
             revert PlayerAlreadyInPool();
         }
         Challenge storage challenge = challengePools[_challengeId];
@@ -411,7 +420,8 @@ abstract contract IMultiChallengePool is Helpers {
         );
         challenge.totalParticipants += 1;
         challenge.totalTickets += _ticketQuantity;
-        optionTickets[_challengeId][_userPrediction].totalSupply += _ticketQuantity;
+        optionTickets[_challengeId][_userPrediction]
+            .totalSupply += _ticketQuantity;
         accumulatedFee += fee;
         _deposit(_stake + fee);
         emit JoinChallengePool(
@@ -493,8 +503,8 @@ abstract contract IMultiChallengePool is Helpers {
         emit WinningsWithdrawn(
             msg.sender,
             _challengeId,
-            winShare,
-            totalWithdrawal
+            totalWithdrawal,
+            winShare
         );
     }
 
@@ -554,7 +564,12 @@ abstract contract IMultiChallengePool is Helpers {
             return 0;
         }
 
-        if (!compareBytes(tickets[_participant][_challengeId].choice, challenge.result)) {
+        if (
+            !compareBytes(
+                tickets[_participant][_challengeId].choice,
+                challenge.result
+            )
+        ) {
             return 0;
         }
         winShare = _computeWinnerShare(challenge, _challengeId);

@@ -6,7 +6,7 @@ import "../interfaces/IEvaluator.sol";
 
 import "../utils/Helpers.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract GeneralStatementEvaluator is IEvaluator, Helpers {
     constructor(
@@ -16,12 +16,8 @@ contract GeneralStatementEvaluator is IEvaluator, Helpers {
     function decodeAndAskProvider(
         IChallengePool.ChallengeEvent calldata _challengeEvent
     ) external override returns (bool) {
-        console.log(_challengeEvent.topicId);
         uint256 statementId = abi.decode(_challengeEvent.eventParam, (uint256));
-        console.log(statementId);
-        console.log(address(dataProvider()));
         bool success = dataProvider().requestData(abi.encode(statementId));
-        console.log(success);
         return success;
     }
 

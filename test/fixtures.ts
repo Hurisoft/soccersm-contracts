@@ -320,3 +320,77 @@ export async function deployGeneralStatementEvaluator() {
     provider,
   };
 }
+
+export async function deployMultiGeneralStatementProviderWithKofiProvder() {
+  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
+    await ethers.getSigners();
+
+  const MultiGeneralStatementProvider = await ethers.getContractFactory(
+    "MultiGeneralStatementProvider"
+  );
+  const provider = await MultiGeneralStatementProvider.deploy();
+
+  await provider.addProvider(kofi);
+
+  return {
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    provider,
+  };
+}
+
+export async function deployMultiGeneralStatementProviderWithKojoReader() {
+  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
+    await ethers.getSigners();
+
+  const MultiGeneralStatementProvider = await ethers.getContractFactory(
+    "MultiGeneralStatementProvider"
+  );
+  const provider = await MultiGeneralStatementProvider.deploy();
+
+  await provider.addReader(kojo);
+
+  return {
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    provider,
+  };
+}
+
+export async function deployMultiGeneralStatementEvaluator() {
+  const { provider, kofi } = await loadFixture(
+    deployGeneralStatementProviderWithKofiProvder
+  );
+
+  const [owner, feeAccount, otherAccount, kojo, kwame] =
+    await ethers.getSigners();
+
+  // deploy general statement evaluator
+  const MultiGeneralStatementEvaluator = await ethers.getContractFactory(
+    "MultiGeneralStatementEvaluator"
+  );
+
+  const evaluator = await MultiGeneralStatementEvaluator.deploy(provider);
+  console.log(await evaluator.getAddress(), "MultiGeneralStatementEvaluator");
+
+  await provider.addReader(await evaluator.getAddress());
+
+  return {
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    evaluator,
+    provider,
+  };
+}

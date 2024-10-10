@@ -2,13 +2,15 @@
 pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interfaces/ITopicDataProvider.sol";
+import "../interfaces/IMultiTopicDataProvider.sol";
 import "../utils/DataProviderAccess.sol";
 import "../utils/Helpers.sol";
 import "../interfaces/IChallengePool.sol";
 
+// import "hardhat/console.sol";
+
 contract MultiGeneralStatementProvider is
-    ITopicDataProvider,
+    IMultiTopicDataProvider,
     DataProviderAccess,
     Helpers
 {
@@ -16,10 +18,12 @@ contract MultiGeneralStatementProvider is
         uint256 statementId;
         string statement;
         uint256 maturity;
-        IChallengePool.Prediction results;
+        bytes result;
+        bytes[] options;
         bool exists;
     }
     mapping(uint256 => Statement) private _statements;
+    mapping(uint256 => mapping(bytes => bool)) internal statementOptions; // statementId > option > bool
     constructor() Ownable(msg.sender) {}
 
     error InvalidStatementId(uint256 _statementId);
@@ -30,15 +34,15 @@ contract MultiGeneralStatementProvider is
     error ModifiedParams(string _paramName);
     error ZeroStatementId();
 
-    event GeneralStatementRequested(
+    event MultiGeneralStatementRequested(
         address indexed _reader,
         uint256 _statementId
     );
-    event GeneralStatementProvided(
+    event MultiGeneralStatementProvided(
         address indexed _provider,
         uint256 _statementId,
         string _statement,
-        IChallengePool.Prediction _results
+        bytes _result
     );
 
     function _statementExists(
@@ -57,7 +61,7 @@ contract MultiGeneralStatementProvider is
         if (_statements[statementId].maturity < block.timestamp) {
             revert InvalidSubmissionDate(_statements[statementId].maturity);
         }
-        emit GeneralStatementRequested(msg.sender, statementId);
+        emit MultiGeneralStatementRequested(msg.sender, statementId);
         return true;
     }
 
@@ -68,11 +72,9 @@ contract MultiGeneralStatementProvider is
             uint256 statementId,
             string memory statement,
             uint256 maturity,
-            IChallengePool.Prediction results
-        ) = abi.decode(
-                _params,
-                (uint256, string, uint256, IChallengePool.Prediction)
-            );
+            bytes memory result,
+            bytes[] memory options
+        ) = abi.decode(_params, (uint256, string, uint256, bytes, bytes[]));
 
         if (statementId == 0) {
             revert ZeroStatementId();
@@ -89,32 +91,41 @@ contract MultiGeneralStatementProvider is
             if (!compareStrings(_statement.statement, statement)) {
                 revert ModifiedParams("statement");
             }
-            if (_statement.results != IChallengePool.Prediction.zero) {
+            if (!compareBytes(_statement.result, emptyBytes)) {
                 revert DataAlreadyProvided();
             }
-            if (results == IChallengePool.Prediction.zero) {
+            if (compareBytes(result, emptyBytes)) {
                 revert InvalidResult();
             }
+            if (!statementOptions[statementId][result]) {
+                revert InvalidResult();
+            }
+            _statement.result = result;
         } else {
             if (maturity <= block.timestamp) {
                 revert InvalidSubmissionDate(maturity);
             }
-            if (results != IChallengePool.Prediction.zero) {
+            if (!compareBytes(result, emptyBytes)) {
                 revert InvalidInitialResult();
             }
+            _statements[statementId] = Statement(
+                statementId,
+                statement,
+                maturity,
+                result,
+                options,
+                true
+            );
+            for (uint256 i = 0; i < options.length; i++) {
+                statementOptions[statementId][options[i]] = true;
+            }
         }
-        _statements[statementId] = Statement(
-            statementId,
-            statement,
-            maturity,
-            results,
-            true
-        );
-        emit GeneralStatementProvided(
+
+        emit MultiGeneralStatementProvided(
             msg.sender,
             statementId,
             statement,
-            results
+            result
         );
     }
 
@@ -125,7 +136,7 @@ contract MultiGeneralStatementProvider is
         if (!_statementExists(statementId)) {
             revert InvalidStatementId(statementId);
         }
-        return abi.encode(_statements[statementId].results);
+        return abi.encode(_statements[statementId].result);
     }
 
     function hasData(
@@ -133,5 +144,20 @@ contract MultiGeneralStatementProvider is
     ) external view override returns (bool) {
         uint256 statementId = abi.decode(_params, (uint256));
         return (_statementExists(statementId));
+    }
+
+    function hasOptions(
+        bytes calldata _params
+    ) external view override returns (bool) {
+        (uint256 statementId, bytes[] memory options) = abi.decode(
+            _params,
+            (uint256, bytes[])
+        );
+        for (uint256 i = 0; i < options.length; i++) {
+            if (!statementOptions[statementId][options[i]]) {
+                return false;
+            }
+        }
+        return true;
     }
 }

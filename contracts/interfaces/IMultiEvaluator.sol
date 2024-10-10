@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.26;
 import "./IMultiChallengePool.sol";
-import "./ITopicDataProvider.sol";
+import "./IMultiTopicDataProvider.sol";
 
-import "../utils/EvaluatorAccess.sol";
+import "../utils/MultiEvaluatorAccess.sol";
 
 import "../utils/Helpers.sol";
 
-abstract contract IMultiEvaluator is EvaluatorAccess, Helpers {
-    constructor(address _dataProvider) EvaluatorAccess(_dataProvider) {}
+abstract contract IMultiEvaluator is MultiEvaluatorAccess, Helpers {
+    constructor(address _dataProvider) MultiEvaluatorAccess(_dataProvider) {}
     function evaluatePoll(
         IMultiChallengePool.Poll calldata _poll
     ) external returns (bytes memory) {
@@ -37,7 +37,11 @@ abstract contract IMultiEvaluator is EvaluatorAccess, Helpers {
         IMultiChallengePool.Poll calldata _poll
     ) external virtual returns (bytes memory);
 
-    function dataProvider() public view returns (ITopicDataProvider) {
+    function dataProvider() public view returns (IMultiTopicDataProvider) {
         return evaluatorDataProvider;
     }
+
+    function hasOptions(
+        bytes calldata _params
+    ) external view virtual returns (bool);
 }

@@ -49,14 +49,14 @@ Url - https://explorer-holesky.morphl2.io/address/0x8BA0d448FAD5469D0BE9E7aF3c2b
 ##### Balls
 
 Deploy - `npx hardhat run scripts/deploy_balls.ts --network morphTestnet`
-Verify - `npx hardhat verify [BALLS] --network morphTestnet --contract contracts/test/TestBalls.sol:TestBalls`
+Verify - `npx hardhat verify [BALLS] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0x93116dD2854cAD543175BFB02966895Cef56f77E
 
 ##### BallsFaucet
 
 Deploy - `npx hardhat run scripts/deploy_faucet.ts --network morphTestnet`
-Verify - `npx hardhat verify [BALLS] --network morphTestnet --contract contracts/test/TestBalls.sol:TestBalls`
-Url - https://explorer-holesky.morphl2.io/address/0xF67cf0708247457AEa36D600A51C8FF42DC97Af4
+Verify - `npx hardhat verify [FAUCET] [BALLS] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0x290b15943f4E5EDe83a5E63B465c57Dde0DF9C8f
 
 #### Challenge Pool
 

@@ -7,7 +7,7 @@ import "../utils/DataProviderAccess.sol";
 import "../utils/Helpers.sol";
 import "../interfaces/IChallengePool.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 contract MultiGeneralStatementProvider is
     IMultiTopicDataProvider,
@@ -79,7 +79,7 @@ contract MultiGeneralStatementProvider is
         if (statementId == 0) {
             revert ZeroStatementId();
         }
-
+        console.log(block.timestamp, maturity);
         if (_statementExists(statementId)) {
             if (maturity > block.timestamp) {
                 revert InvalidSubmissionDate(maturity);

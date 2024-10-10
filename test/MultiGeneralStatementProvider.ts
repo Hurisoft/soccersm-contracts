@@ -241,7 +241,7 @@ describe("MultiGeneralStatementProvider", function () {
       await expect(provider.connect(kofi).provideData(param3))
         .to.revertedWithCustomError(provider, "InvalidSubmissionDate")
         .withArgs(maturity);
-      await time.increase(60 * 60 * 65);
+      await time.increase(60 * 60 * 66);
       await expect(provider.connect(kofi).provideData(param3))
         .to.revertedWithCustomError(provider, "ModifiedParams")
         .withArgs("statement");

@@ -145,3 +145,10 @@ Url - https://explorer-holesky.morphl2.io/address/0x2E0d26374341C9C85D3d22e197d2
 
 #### Create General Statements
 `npx hardhat run scripts/create_statements.ts --network morphTestnet`
+
+#### Games
+
+##### Spin Wheel
+Deploy - `npx hardhat run scripts/deploy_wheel.ts --network morphTestnet`
+Verify - `npx hardhat verify [WHEEL] [BALLS] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0xf8B452BcBF89d2bab50c03064013C605068cCAb0

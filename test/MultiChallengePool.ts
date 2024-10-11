@@ -149,11 +149,11 @@ async function deployCreateChallenges() {
   const statementId = 404;
   const statement = "Ghana 2024 Elections Result.";
   const maturity = Math.floor(Date.now() / 1000) + 60 * 60 * 100;
-  const result = ethers.toUtf8Bytes("");
+  const result = ethers.hexlify(ethers.toUtf8Bytes(""));
   const options = [
-    ethers.toUtf8Bytes("NPP"),
-    ethers.toUtf8Bytes("NDC"),
-    ethers.toUtf8Bytes("NEW FORCE"),
+    ethers.hexlify(ethers.toUtf8Bytes("NPP")),
+    ethers.hexlify(ethers.toUtf8Bytes("NDC")),
+    ethers.hexlify(ethers.toUtf8Bytes("NEW FORCE")),
   ];
   const param1 = coder.encode(["uint256"], [statementId]);
   const dataProvided = coder.encode(

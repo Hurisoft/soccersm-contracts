@@ -36,7 +36,6 @@ describe("BallsFaucet", function () {
       await expect(
         faucet.connect(otherAccount).claim()
       ).revertedWithCustomError(faucet, "AlreadyClaimed");
-
     });
   });
 });

@@ -446,21 +446,8 @@ describe("ChallengePool", function () {
         .withArgs(0, await kojo.getAddress(), 1, ethers.hexlify(result2));
     });
     it("Should Fail to Close Challenge", async function () {
-      const {
-        kojo,
-        generalStatementProvider,
-        statement,
-        statementId,
-        ballsToken,
-        pool,
-        airDropBalls,
-        joinStakeFee,
-        owner,
-        adwoa,
-        param2,
-        param1,
-        result2,
-      } = await loadFixture(deployCreateChallenges);
+      const { ballsToken, pool, airDropBalls, joinStakeFee, adwoa } =
+        await loadFixture(deployCreateChallenges);
       const adwoaPrediction = ethers.toUtf8Bytes("NPP");
 
       await ballsToken.transfer(adwoa, airDropBalls);

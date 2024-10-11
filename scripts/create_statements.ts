@@ -6,9 +6,9 @@ async function main() {
     process.env.GENERAL_STATEMENT_PROVIDER!
   );
   const coder = new ethers.AbiCoder();
-  const statementId = 107;
-  const statement = "Namibia will elect their first female President in 2024";
-  const maturity = 1730419200;
+  const statementId = 10;
+  const statement = "Will Crypto.com win their case against the SEC?";
+  const maturity = 1735689600;
   const result = 0;
   const param = coder.encode(
     ["uint256", "string", "uint256", "uint8"],

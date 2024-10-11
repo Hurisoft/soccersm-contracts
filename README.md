@@ -44,6 +44,12 @@ Deploy - `npx hardhat run scripts/deploy_topic_registry.ts --network morphTestne
 Verify - `npx hardhat verify [TOPIC_REGISTRY] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0x8BA0d448FAD5469D0BE9E7aF3c2b7be0d689db47
 
+#### Multi Topic Registry
+
+Deploy - `npx hardhat run scripts/deploy_multi_topic_registry.ts --network morphTestnet`
+Verify - `npx hardhat verify --contract contracts/challenge-pool/MultiTopicRegistry.sol:MultiTopicRegistry [MULTI_TOPIC_REGISTRY] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0x89311B7a4306547243124e981f5B5144e98Dc064
+
 #### ERC20 Tokens
 
 ##### Balls
@@ -63,6 +69,12 @@ Url - https://explorer-holesky.morphl2.io/address/0x290b15943f4E5EDe83a5E63B465c
 Deploy - `npx hardhat run scripts/deploy_test_challenge_pool.ts --network morphTestnet`
 Verify - `npx hardhat verify --network morphTestnet --constructor-args contract-args/challenge_pool.ts [CHALLENGE_POOL]`
 Url - https://explorer-holesky.morphl2.io/address/0xeA9316E285AdAb8d931c9031720a525E4d1a2097
+
+#### Multi Challenge Pool
+
+Deploy - `npx hardhat run scripts/deploy_multi_challenge_pool.ts --network morphTestnet`
+Verify - `npx hardhat verify --network morphTestnet --constructor-args contract-args/multi_challenge_pool.ts [MULTI_CHALLENGE_POOL]`
+Url - https://explorer-holesky.morphl2.io/address/0xc6A21cBFCA0Da1FEe96CB728D8dcDD99Fa40FBC0
 
 #### Deploy Providers
 
@@ -85,6 +97,12 @@ Url - https://explorer-holesky.morphl2.io/address/0x3462AA899f5b0ba0b908f82EEbE2
 Deploy - `npx hardhat run scripts/deploy_multi_provider.ts --network morphTestnet`
 Verify - `npx hardhat verify [MULTI_PROVIDER] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0xf59EC49749696E910a06eB87c24f723e97D6484d
+
+##### Multi General Statement Provider
+Deploy - `npx hardhat run scripts/deploy_multi_general_statement_provider.ts --network morphTestnet`
+Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0x7406Fa6D294F24A9801576Be8B5e90DC8E407591
+
 #### Deploy Evaluators
 
 ##### Football Outcome Evaluator
@@ -116,6 +134,11 @@ Url - https://explorer-holesky.morphl2.io/address/0xC080c3Bad87f90F00ce49C5953dF
 Deploy - `npx hardhat run scripts/deploy_general_statement_evaluator.ts --network morphTestnet`
 Verify - `npx hardhat verify [GENERAL_STATEMENT_EVALUATOR] [GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
 Url - https://explorer-holesky.morphl2.io/address/0x3Ee3BD686c2ed6e56B7484401D047f317BeB0881
+
+##### Multi General Statement Evaluator
+Deploy - `npx hardhat run scripts/deploy_multi_general_statement_evaluator.ts --network morphTestnet`
+Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_EVALUATOR] [MULTI_GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
+Url - https://explorer-holesky.morphl2.io/address/0x2E0d26374341C9C85D3d22e197d213A5203cdF9D
 
 #### Create Topics
 `npx hardhat run scripts/create_topics.ts --network morphTestnet`

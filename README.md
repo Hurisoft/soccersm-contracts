@@ -36,119 +36,119 @@
 
 ## Deployments
 
-### Morph Holesky
+### Lisk Sepolia
 
 #### Topic Registry
 
-Deploy - `npx hardhat run scripts/deploy_topic_registry.ts --network morphTestnet`
-Verify - `npx hardhat verify [TOPIC_REGISTRY] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x8BA0d448FAD5469D0BE9E7aF3c2b7be0d689db47
+Deploy - `npx hardhat run scripts/deploy_topic_registry.ts --network liskTestnet`
+Verify - `npx hardhat verify --contract contracts/challenge-pool/TopicRegistry.sol:TopicRegistry [TOPIC_REGISTRY] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0xACBC1eC300bBea9A9FD0A661cD717d8519c5FCA5
 
 #### Multi Topic Registry
 
-Deploy - `npx hardhat run scripts/deploy_multi_topic_registry.ts --network morphTestnet`
-Verify - `npx hardhat verify --contract contracts/challenge-pool/MultiTopicRegistry.sol:MultiTopicRegistry [MULTI_TOPIC_REGISTRY] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x89311B7a4306547243124e981f5B5144e98Dc064
+Deploy - `npx hardhat run scripts/deploy_multi_topic_registry.ts --network liskTestnet`
+Verify - `npx hardhat verify --contract contracts/challenge-pool/MultiTopicRegistry.sol:MultiTopicRegistry [MULTI_TOPIC_REGISTRY] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0x28cB409154beb695D5E9ffA85dA8f1564Aa3cD76
 
 #### ERC20 Tokens
 
 ##### Balls
 
-Deploy - `npx hardhat run scripts/deploy_balls.ts --network morphTestnet`
-Verify - `npx hardhat verify [BALLS] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x93116dD2854cAD543175BFB02966895Cef56f77E
+Deploy - `npx hardhat run scripts/deploy_balls.ts --network liskTestnet`
+Verify - `npx hardhat verify [BALLS] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0x935E49458145B917a0EaEE279652F724EA78d8F0
 
 ##### BallsFaucet
 
-Deploy - `npx hardhat run scripts/deploy_faucet.ts --network morphTestnet`
-Verify - `npx hardhat verify [FAUCET] [BALLS] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x290b15943f4E5EDe83a5E63B465c57Dde0DF9C8f
+Deploy - `npx hardhat run scripts/deploy_faucet.ts --network liskTestnet`
+Verify - `npx hardhat verify [FAUCET] [BALLS] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0xa7c3a5bd99E11E0d8cD21952a0133449b194d3A8
 
 #### Challenge Pool
 
-Deploy - `npx hardhat run scripts/deploy_test_challenge_pool.ts --network morphTestnet`
-Verify - `npx hardhat verify --network morphTestnet --constructor-args contract-args/challenge_pool.ts [CHALLENGE_POOL]`
-Url - https://explorer-holesky.morphl2.io/address/0xeA9316E285AdAb8d931c9031720a525E4d1a2097
+Deploy - `npx hardhat run scripts/deploy_challenge_pool.ts --network liskTestnet`
+Verify - `npx hardhat verify --network liskTestnet --constructor-args contract-args/challenge_pool.ts [CHALLENGE_POOL]`
+Url - https://sepolia-blockscout.lisk.com/address/0xB2002EaFC86DD21eaDAed4b1a7857357a6C3f41f
 
 #### Multi Challenge Pool
 
-Deploy - `npx hardhat run scripts/deploy_multi_challenge_pool.ts --network morphTestnet`
-Verify - `npx hardhat verify --network morphTestnet --constructor-args contract-args/multi_challenge_pool.ts [MULTI_CHALLENGE_POOL]`
-Url - https://explorer-holesky.morphl2.io/address/0xc6A21cBFCA0Da1FEe96CB728D8dcDD99Fa40FBC0
+Deploy - `npx hardhat run scripts/deploy_multi_challenge_pool.ts --network liskTestnet`
+Verify - `npx hardhat verify --network liskTestnet --constructor-args contract-args/multi_challenge_pool.ts [MULTI_CHALLENGE_POOL]`
+Url - https://sepolia-blockscout.lisk.com/address/
 
 #### Deploy Providers
 
 ##### Asset Price Provider
-Deploy - `npx hardhat run scripts/deploy_asset_price_provider.ts --network morphTestnet`
-Verify - `npx hardhat verify [ASSET_PRICE_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x87a0Ab77f3F4A4E525EBA0CdFac8dA64E637d0Fe
+Deploy - `npx hardhat run scripts/deploy_asset_price_provider.ts --network liskTestnet`
+Verify - `npx hardhat verify [ASSET_PRICE_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0x08FD9b19435dD5bdbaF183EE3fe68dCD6fD709EF
 
 ##### Football Score Provider
-Deploy - `npx hardhat run scripts/deploy_football_score_provider.ts --network morphTestnet`
-Verify - `npx hardhat verify [GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x165a2B4F2e9C6c85D545c34aE3f00D1A2A5877eA
+Deploy - `npx hardhat run scripts/deploy_football_score_provider.ts --network liskTestnet`
+Verify - `npx hardhat verify [FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0x53637cE365d796FA32eE3FB1A0cB8408Df0fB554
 
 ##### General Statement Provider
-Deploy - `npx hardhat run scripts/deploy_general_statement_provider.ts --network morphTestnet`
-Verify - `npx hardhat verify [FOOTBALL_SCORE_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x3462AA899f5b0ba0b908f82EEbE2D2969EC44A1c
+Deploy - `npx hardhat run scripts/deploy_general_statement_provider.ts --network liskTestnet`
+Verify - `npx hardhat verify [GENERAL_STATEMENT_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0xF5Bd8F96A9cb7e27a838aFA4AF55df5594bc9041
 
 ##### Multi Provider
-Deploy - `npx hardhat run scripts/deploy_multi_provider.ts --network morphTestnet`
-Verify - `npx hardhat verify [MULTI_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0xf59EC49749696E910a06eB87c24f723e97D6484d
+Deploy - `npx hardhat run scripts/deploy_multi_provider.ts --network liskTestnet`
+Verify - `npx hardhat verify [MULTI_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/
 
 ##### Multi General Statement Provider
-Deploy - `npx hardhat run scripts/deploy_multi_general_statement_provider.ts --network morphTestnet`
-Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x7406Fa6D294F24A9801576Be8B5e90DC8E407591
+Deploy - `npx hardhat run scripts/deploy_multi_general_statement_provider.ts --network liskTestnet`
+Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/
 
 #### Deploy Evaluators
 
 ##### Football Outcome Evaluator
-Deploy - `npx hardhat run scripts/deploy_football_outcome_evaluator.ts --network morphTestnet`
-Verify - `npx hardhat verify [FOOTBALL_OUTCOME_EVALUATOR] [FOOTBALL_SCORE_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0xA0ae218688261800C9cfdE604c31520f54BaB494
+Deploy - `npx hardhat run scripts/deploy_football_outcome_evaluator.ts --network liskTestnet`
+Verify - `npx hardhat verify [FOOTBALL_OUTCOME_EVALUATOR] [FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0x7281b4cCA308aF757D8BE75e62241e5e0c88CAA3
 
 ##### Football Over Under Evaluator
-Deploy - `npx hardhat run scripts/deploy_football_over_under_evaluator.ts --network morphTestnet`
-Verify - `npx hardhat verify [FOOTBALL_OVER_UNDER_EVALUATOR] [FOOTBALL_SCORE_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0xF9Ae3039535F030c9e8118C71FC68DE1089f5a0a
+Deploy - `npx hardhat run scripts/deploy_football_over_under_evaluator.ts --network liskTestnet`
+Verify - `npx hardhat verify [FOOTBALL_OVER_UNDER_EVALUATOR] [FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0xc1272b64F1b500dCe5059b3951afEA77b329e2B9
 
 ##### Football Correct Score Evaluator
-Deploy - `npx hardhat run scripts/deploy_football_correct_score_evaluator.ts --network morphTestnet`
-Verify - `npx hardhat verify [FOOTBALL_CORRECT_SCORE_EVALUATOR] [FOOTBALL_SCORE_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x85a14478ACB2D22C740CB69e15C744b8173C5Ae8
+Deploy - `npx hardhat run scripts/deploy_football_correct_score_evaluator.ts --network liskTestnet`
+Verify - `npx hardhat verify [FOOTBALL_CORRECT_SCORE_EVALUATOR] [FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0x76411bBAAf025F3D25aFFcEb79209eE89cA554Bd
 
 ##### Asset Price Bounded Evaluator
-Deploy - `npx hardhat run scripts/deploy_asset_price_bounded_evaluator.ts --network morphTestnet`
-Verify - `npx hardhat verify [ASSET_PRICE_BOUNDED_EVALUATOR] [ASSET_PRICE_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x252Ba1b6E8b97Fa4759d4F180244810C612B273F
+Deploy - `npx hardhat run scripts/deploy_asset_price_bounded_evaluator.ts --network liskTestnet`
+Verify - `npx hardhat verify [ASSET_PRICE_BOUNDED_EVALUATOR] [ASSET_PRICE_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0x39a7f0a342a0509C1aC248F379ba283e99c36Ae5
 
 ##### Asset Price Target Evaluator
-Deploy - `npx hardhat run scripts/deploy_asset_price_target_evaluator.ts --network morphTestnet`
-Verify - `npx hardhat verify [ASSET_PRICE_TARGET_EVALUATOR] [ASSET_PRICE_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0xC080c3Bad87f90F00ce49C5953dFDd1189918adA
+Deploy - `npx hardhat run scripts/deploy_asset_price_target_evaluator.ts --network liskTestnet`
+Verify - `npx hardhat verify [ASSET_PRICE_TARGET_EVALUATOR] [ASSET_PRICE_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0xB3b75E9d2BAE1Aa3AF2caeC46ec7377c27f09D28
 
 ##### General Statement Evaluator
-Deploy - `npx hardhat run scripts/deploy_general_statement_evaluator.ts --network morphTestnet`
-Verify - `npx hardhat verify [GENERAL_STATEMENT_EVALUATOR] [GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x3Ee3BD686c2ed6e56B7484401D047f317BeB0881
+Deploy - `npx hardhat run scripts/deploy_general_statement_evaluator.ts --network liskTestnet`
+Verify - ````npx hardhat verify [GENERAL_STATEMENT_EVALUATOR] [GENERAL_STATEMENT_PROVIDER] --network liskTestnet````
+Url - https://sepolia-blockscout.lisk.com/address/0xEd64A15A6223588794A976d344990001a065F3f1
 
 ##### Multi General Statement Evaluator
-Deploy - `npx hardhat run scripts/deploy_multi_general_statement_evaluator.ts --network morphTestnet`
-Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_EVALUATOR] [MULTI_GENERAL_STATEMENT_PROVIDER] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0x2E0d26374341C9C85D3d22e197d213A5203cdF9D
+Deploy - `npx hardhat run scripts/deploy_multi_general_statement_evaluator.ts --network liskTestnet`
+Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_EVALUATOR] [MULTI_GENERAL_STATEMENT_PROVIDER] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0xd96c0BDC90b3fc41F15d348c3D539e427162F5B7
 
 #### Create Topics
-`npx hardhat run scripts/create_topics.ts --network morphTestnet`
+`npx hardhat run scripts/create_topics.ts --network liskTestnet`
 
 #### Create General Statements
-`npx hardhat run scripts/create_statements.ts --network morphTestnet`
+`npx hardhat run scripts/create_statements.ts --network liskTestnet`
 
 #### Games
 
 ##### Spin Wheel
-Deploy - `npx hardhat run scripts/deploy_wheel.ts --network morphTestnet`
-Verify - `npx hardhat verify [WHEEL] [BALLS] --network morphTestnet`
-Url - https://explorer-holesky.morphl2.io/address/0xf8B452BcBF89d2bab50c03064013C605068cCAb0
+Deploy - `npx hardhat run scripts/deploy_wheel.ts --network liskTestnet`
+Verify - `npx hardhat verify [WHEEL] [BALLS] --network liskTestnet`
+Url - https://sepolia-blockscout.lisk.com/address/0xd96c0BDC90b3fc41F15d348c3D539e427162F5B7

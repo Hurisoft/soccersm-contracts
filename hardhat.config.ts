@@ -18,33 +18,23 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    morphTestnet: {
-      url: "https://rpc-quicknode-holesky.morphl2.io",
-      accounts: [process.env.PRIVATE_KEY!],
-      gasPrice: 20000000000, // 2 gwei in wei
-    },
-    optimism: {
-      url: "https://optimism-mainnet.infura.io/v3/82de4c56f4364dd899635d8ebbc349cc",
-      chainId: 10,
-      accounts: [process.env.PRIVATE_KEY!],
-    },
-    optimismTestnet: {
-      url: "https://optimism-sepolia.infura.io/v3/82de4c56f4364dd899635d8ebbc349cc",
-      chainId: 11155420,
+    liskTestnet: {
+      url: "https://rpc.sepolia-api.lisk.com",
+      chainId: 4202,
       accounts: [process.env.PRIVATE_KEY!],
     },
   },
   etherscan: {
     apiKey: {
-      morphTestnet: "anything",
+      liskTestnet: "liskTestnet"
     },
     customChains: [
       {
-        network: "morphTestnet",
-        chainId: 2810,
+        network: "liskTestnet",
+        chainId: 4202,
         urls: {
-          apiURL: "https://explorer-api-holesky.morphl2.io/api? ",
-          browserURL: "https://explorer-holesky.morphl2.io/",
+          apiURL: "https://sepolia-blockscout.lisk.com/api",
+          browserURL: "https://sepolia-blockscout.lisk.com",
         },
       },
     ],

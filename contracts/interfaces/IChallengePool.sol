@@ -48,7 +48,7 @@ abstract contract IChallengePool is Helpers {
 
     // ============ protocol variables =============
     uint256 public poolFee = 10; // in basis point
-    uint256 public joinPeriod = 9000; // in basis point
+    uint256 public joinPeriod = 10000; // in basis point
     uint256 public maxMaturityPeriod = 12 weeks;
     uint256 public maxPlayersPerPool = 100;
     uint256 public minStakeAmount = 100 * 1e18;
@@ -109,8 +109,7 @@ abstract contract IChallengePool is Helpers {
         address indexed participant,
         uint256 stake,
         uint256 fee,
-        uint256 yesParticipants,
-        uint256 noParticipants,
+        Prediction userPrediction,
         PoolState state
     );
     event WinningsWithdrawn(
@@ -440,8 +439,7 @@ abstract contract IChallengePool is Helpers {
             msg.sender,
             _stake,
             fee,
-            challenge.yesParticipants,
-            challenge.noParticipants,
+            _userPrediction,
             currentState
         );
     }

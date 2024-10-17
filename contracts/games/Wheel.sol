@@ -15,12 +15,12 @@ contract Wheel is Ownable {
     uint256[] public wheel = [
         100 * 1e18,
         20 * 1e18,
-        300 * 1e18,
+        90 * 1e18,
         40 * 1e18,
-        500 * 1e18,
         60 * 1e18,
-        70 * 1e18,
-        80 * 1e18
+        30 * 1e18,
+        10 * 1e18,
+        50 * 1e18
     ];
     constructor(address _balls) Ownable(msg.sender) {
         balls = IERC20(_balls);

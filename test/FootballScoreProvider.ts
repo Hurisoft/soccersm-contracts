@@ -17,7 +17,6 @@ export async function deployFootballScoreProvider() {
   const provider = await FootballScoreProvider.deploy();
 
   await provider.addProvider(owner);
-  console.log(await provider.getAddress(), "FootballScoreProvider");
 
   return {
     owner,

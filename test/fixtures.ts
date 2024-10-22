@@ -50,6 +50,50 @@ export async function deployFootballScoreProviderWithKojoReader() {
   };
 }
 
+export async function deployMultiFootballScoreProviderWithKofiProvder() {
+  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
+    await ethers.getSigners();
+
+  const FootballScoreProvider = await ethers.getContractFactory(
+    "MultiFootballScoreProvider"
+  );
+  const provider = await FootballScoreProvider.deploy();
+
+  await provider.addProvider(kofi);
+
+  return {
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    provider,
+  };
+}
+
+export async function deployMultiFootballScoreProviderWithKojoReader() {
+  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
+    await ethers.getSigners();
+
+  const FootballScoreProvider = await ethers.getContractFactory(
+    "MultiFootballScoreProvider"
+  );
+  const provider = await FootballScoreProvider.deploy();
+
+  await provider.addReader(kojo);
+
+  return {
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    provider,
+  };
+}
+
 export async function deployFootballOutcomeEvaluator() {
   const { provider, kofi } = await loadFixture(
     deployFootballScoreProviderWithKofiProvder
@@ -64,8 +108,6 @@ export async function deployFootballOutcomeEvaluator() {
   );
 
   const evaluator = await FootballOutcomeEvaluator.deploy(provider);
-
-  console.log(await evaluator.getAddress(), "FootballOutcomeEvaluator");
 
   await provider.addReader(await evaluator.getAddress());
 
@@ -95,7 +137,6 @@ export async function deployFootBallCorrectScoreEvaluator() {
   );
 
   const evaluator = await FootBallCorrectScoreEvaluator.deploy(provider);
-  console.log(await evaluator.getAddress(), "FootBallCorrectScoreEvaluator");
 
   await provider.addReader(await evaluator.getAddress());
 
@@ -125,7 +166,6 @@ export async function deployFootballOverUnderEvaluator() {
   );
 
   const evaluator = await FootballOverUnderEvaluator.deploy(provider);
-  console.log(await evaluator.getAddress(), "FootballOverUnderEvaluator");
 
   await provider.addReader(await evaluator.getAddress());
 
@@ -185,6 +225,50 @@ export async function deployAssetPriceProviderWithKojoReader() {
   };
 }
 
+export async function deployMultiAssetPriceProviderWithKofiProvder() {
+  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
+    await ethers.getSigners();
+
+  const AssetPriceProvider = await ethers.getContractFactory(
+    "MultiAssetPriceProvider"
+  );
+  const provider = await AssetPriceProvider.deploy();
+
+  await provider.addProvider(kofi);
+
+  return {
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    provider,
+  };
+}
+
+export async function deployMultiAssetPriceProviderWithKojoReader() {
+  const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
+    await ethers.getSigners();
+
+  const AssetPriceProvider = await ethers.getContractFactory(
+    "MultiAssetPriceProvider"
+  );
+  const provider = await AssetPriceProvider.deploy();
+
+  await provider.addReader(kojo);
+
+  return {
+    owner,
+    feeAccount,
+    otherAccount,
+    kojo,
+    kwame,
+    kofi,
+    provider,
+  };
+}
+
 export async function deployAssetPriceTargetEvaluator() {
   const { provider, kofi } = await loadFixture(
     deployAssetPriceProviderWithKofiProvder
@@ -199,8 +283,6 @@ export async function deployAssetPriceTargetEvaluator() {
   );
 
   const evaluator = await AssetPriceTargetEvaluator.deploy(provider);
-
-  console.log(await evaluator.getAddress(), "AssetPriceTargetEvaluator");
 
   await provider.addReader(await evaluator.getAddress());
 
@@ -230,8 +312,6 @@ export async function deployAssetPriceBoundedEvaluator() {
   );
 
   const evaluator = await AssetPriceBoundedEvaluator.deploy(provider);
-
-  console.log(await evaluator.getAddress(), "AssetPriceBoundedEvaluator");
 
   await provider.addReader(await evaluator.getAddress());
 
@@ -305,7 +385,6 @@ export async function deployGeneralStatementEvaluator() {
   );
 
   const evaluator = await GeneralStatementEvaluator.deploy(provider);
-  console.log(await evaluator.getAddress(), "GeneralStatementEvaluator");
 
   await provider.addReader(await evaluator.getAddress());
 
@@ -379,7 +458,6 @@ export async function deployMultiGeneralStatementEvaluator() {
   );
 
   const evaluator = await MultiGeneralStatementEvaluator.deploy(provider);
-  console.log(await evaluator.getAddress(), "MultiGeneralStatementEvaluator");
 
   await provider.addReader(await evaluator.getAddress());
 

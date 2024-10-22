@@ -1,6 +1,7 @@
 import {
   time,
   loadFixture,
+  reset,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
@@ -20,8 +21,8 @@ async function deployChallengePool() {
     yaa,
   ] = await ethers.getSigners();
 
-  const TopicRegistry = await ethers.getContractFactory("MultiTopicRegistry");
-  const registry = await TopicRegistry.deploy();
+  const MultiTopicRegistry = await ethers.getContractFactory("MultiTopicRegistry");
+  const registry = await MultiTopicRegistry.deploy();
 
   const MultiGeneralStatementProvider = await ethers.getContractFactory(
     "MultiGeneralStatementProvider"
@@ -29,10 +30,6 @@ async function deployChallengePool() {
   const generalStatementProvider = await MultiGeneralStatementProvider.deploy();
 
   await generalStatementProvider.addProvider(owner);
-  console.log(
-    await generalStatementProvider.getAddress(),
-    "MultiGeneralStatementProvider"
-  );
 
   const MultiGeneralStatementEvaluator = await ethers.getContractFactory(
     "MultiGeneralStatementEvaluator"
@@ -40,10 +37,6 @@ async function deployChallengePool() {
 
   const generalStatementEvaluator = await MultiGeneralStatementEvaluator.deploy(
     await generalStatementProvider.getAddress()
-  );
-  console.log(
-    await generalStatementEvaluator.getAddress(),
-    "MultiGeneralStatementEvaluator"
   );
 
   await generalStatementProvider.addReader(
@@ -56,11 +49,7 @@ async function deployChallengePool() {
     "General Statement",
     "Any and all statements",
     await generalStatementEvaluator.getAddress()
-  ); // 5
-  console.log(
-    await generalStatementEvaluator.getAddress(),
-    "generalStatementEvaluator\n"
-  );
+  ); // 0
 
   const topicIds = {
     general: BigInt(0),
@@ -231,7 +220,11 @@ async function deployCreateChallenges() {
   };
 }
 
-describe("ChallengePool", function () {
+describe("MultiChallengePoolGeneralStatement", function () {
+  before(function () {
+    // runs once before the first test in this block
+    reset()
+  });
   describe("Deployment", function () {
     it("Should Deploy Pool", async function () {
       await loadFixture(deployChallengePool);

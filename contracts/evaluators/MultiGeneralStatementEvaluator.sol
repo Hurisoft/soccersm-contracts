@@ -18,7 +18,7 @@ contract MultiGeneralStatementEvaluator is IMultiEvaluator {
     ) external override returns (bool) {
         uint256 statementId = abi.decode(_poll.pollParam, (uint256));
         bool options = this.hasOptions(abi.encode(statementId, _poll.options));
-        if(!options) {
+        if (!options) {
             return false;
         }
         bool success = dataProvider().requestData(abi.encode(statementId));
@@ -34,11 +34,7 @@ contract MultiGeneralStatementEvaluator is IMultiEvaluator {
         if (!dataProvider().hasData(encodedStatementId)) {
             return emptyBytes;
         }
-        return
-            abi.decode(
-                dataProvider().getData(encodedStatementId),
-                (bytes)
-            );
+        return abi.decode(dataProvider().getData(encodedStatementId), (bytes));
     }
 
     function hasOptions(

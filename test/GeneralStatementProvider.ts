@@ -20,7 +20,6 @@ export async function deployGeneralStatementProvider() {
 
   await provider.addProvider(owner);
   await provider.addReader(kwame);
-  console.log(await provider.getAddress(), "GeneralStatementProvider");
 
   return {
     owner,

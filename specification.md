@@ -262,3 +262,24 @@ When a user is staking on a pool they can purchase as many tickets as possible a
 - `createPoolFee` - percentage of stake to be charged as pool fee when creating a pool
 
 - `joinPoolFee` - percentage of stake to be charged as pool fee when joining a pool
+
+
+### Multi Football & Assets Evaluators
+
+#### Multi Football Evaluators
+
+1. Total Goals Exact
+
+2. Total Goals Range
+
+3. Correct Score
+
+4. Outcome
+
+
+#### Multi Assets Evaluators
+
+1. Price Range
+
+2. 
+

@@ -1,20 +1,24 @@
 import {
   time,
   loadFixture,
+  reset,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { deployAssetPriceProviderWithKojoReader, deployAssetPriceProviderWithKofiProvder } from "./fixtures";
+import {
+  deployMultiAssetPriceProviderWithKojoReader,
+  deployMultiAssetPriceProviderWithKofiProvder,
+} from "./fixtures";
 
-export async function deployAssetPriceProvider() {
+export async function deployMultiAssetPriceProvider() {
   const [owner, feeAccount, otherAccount, kojo, kwame, kofi] =
     await ethers.getSigners();
 
-  const AssetPriceProvider = await ethers.getContractFactory(
-    "AssetPriceProvider"
+  const MultiAssetPriceProvider = await ethers.getContractFactory(
+    "MultiAssetPriceProvider"
   );
-  const provider = await AssetPriceProvider.deploy();
+  const provider = await MultiAssetPriceProvider.deploy();
 
   await provider.addProvider(owner);
 
@@ -29,23 +33,28 @@ export async function deployAssetPriceProvider() {
   };
 }
 
-
-describe("AssetPriceProvider", function () {
+describe("MultiAssetPriceProvider", function () {
+  before(function () {
+    // runs once before the first test in this block
+    reset()
+  });
   describe("Deployment", function () {
     it("Should Deploy Pool", async function () {
-      await loadFixture(deployAssetPriceProvider);
+      await loadFixture(deployMultiAssetPriceProvider);
     });
   });
   describe("Add Provider", function () {
     it("Should Add Provider", async function () {
-      const { provider, kofi } = await loadFixture(deployAssetPriceProvider);
+      const { provider, kofi } = await loadFixture(
+        deployMultiAssetPriceProvider
+      );
       const newProvider = await kofi.getAddress();
       await provider.addProvider(newProvider);
       expect(await provider.isProvider(newProvider)).to.be.true;
     });
     it("Should Fail to Add Provider", async function () {
       const { provider, otherAccount, kofi } = await loadFixture(
-        deployAssetPriceProvider
+        deployMultiAssetPriceProvider
       );
       const newProvider = await kofi.getAddress();
       await expect(provider.connect(otherAccount).addProvider(newProvider))
@@ -56,7 +65,9 @@ describe("AssetPriceProvider", function () {
   });
   describe("Remove Provider", function () {
     it("Should Remove Provider", async function () {
-      const { provider, kofi } = await loadFixture(deployAssetPriceProvider);
+      const { provider, kofi } = await loadFixture(
+        deployMultiAssetPriceProvider
+      );
       const newProvider = await kofi.getAddress();
       await provider.addProvider(newProvider);
       await provider.removeProvider(newProvider);
@@ -64,7 +75,7 @@ describe("AssetPriceProvider", function () {
     });
     it("Should Fail to Remove Provider", async function () {
       const { provider, otherAccount, kofi } = await loadFixture(
-        deployAssetPriceProvider
+        deployMultiAssetPriceProvider
       );
       const newProvider = await kofi.getAddress();
       await provider.addProvider(newProvider);
@@ -76,14 +87,16 @@ describe("AssetPriceProvider", function () {
   });
   describe("Add Reader", function () {
     it("Should Add Reader", async function () {
-      const { provider, kofi } = await loadFixture(deployAssetPriceProvider);
+      const { provider, kofi } = await loadFixture(
+        deployMultiAssetPriceProvider
+      );
       const newReader = await kofi.getAddress();
       await provider.addReader(newReader);
       expect(await provider.isReader(newReader)).to.be.true;
     });
     it("Should Fail to Add Reader", async function () {
       const { provider, otherAccount, kofi } = await loadFixture(
-        deployAssetPriceProvider
+        deployMultiAssetPriceProvider
       );
       const newReader = await kofi.getAddress();
       await expect(provider.connect(otherAccount).addReader(newReader))
@@ -94,14 +107,16 @@ describe("AssetPriceProvider", function () {
   });
   describe("Remove Reader", function () {
     it("Should Remove Reader", async function () {
-      const { provider, kofi } = await loadFixture(deployAssetPriceProvider);
+      const { provider, kofi } = await loadFixture(
+        deployMultiAssetPriceProvider
+      );
       const newReader = await kofi.getAddress();
       await provider.removeReader(newReader);
       expect(await provider.isReader(newReader)).to.be.false;
     });
     it("Should Fail to Remove Reader", async function () {
       const { provider, otherAccount, kofi } = await loadFixture(
-        deployAssetPriceProvider
+        deployMultiAssetPriceProvider
       );
       const newReader = await kofi.getAddress();
       await provider.addReader(newReader);
@@ -114,19 +129,19 @@ describe("AssetPriceProvider", function () {
   describe("Request Data", function () {
     it("Should Request Data", async function () {
       const { provider, kojo } = await loadFixture(
-        deployAssetPriceProviderWithKojoReader
+        deployMultiAssetPriceProviderWithKojoReader
       );
       const coder = new ethers.AbiCoder();
       const assetSymbol = "BTC";
       const date = Math.floor(Date.now() / 1000) - 60 * 60 * 2;
       const param = coder.encode(["string", "uint256"], [assetSymbol, date]);
       await expect(provider.connect(kojo).requestData(param))
-        .to.emit(provider, "AssetPriceRequested")
+        .to.emit(provider, "MultiAssetPriceRequested")
         .withArgs(await kojo.getAddress(), assetSymbol, date);
     });
     it("Should Fail to Request Data", async function () {
       const { provider, kofi } = await loadFixture(
-        deployAssetPriceProviderWithKojoReader
+        deployMultiAssetPriceProviderWithKojoReader
       );
       const coder = new ethers.AbiCoder();
       const assetSymbol = "BTC";
@@ -140,7 +155,7 @@ describe("AssetPriceProvider", function () {
   describe("Provide Data", function () {
     it("Should Provide Data", async function () {
       const { provider, kofi } = await loadFixture(
-        deployAssetPriceProviderWithKofiProvder
+        deployMultiAssetPriceProviderWithKofiProvder
       );
       const coder = new ethers.AbiCoder();
       const assetSymbol = "BTC";
@@ -151,7 +166,7 @@ describe("AssetPriceProvider", function () {
         [assetSymbol, date, price]
       );
       await expect(provider.connect(kofi).provideData(param))
-        .to.emit(provider, "AssetPriceProvided")
+        .to.emit(provider, "MultiAssetPriceProvided")
         .withArgs(await kofi.getAddress(), assetSymbol, date, price);
       const assetDateParam = coder.encode(
         ["string", "uint256"],
@@ -166,7 +181,7 @@ describe("AssetPriceProvider", function () {
     });
     it("Should Fail to Provide Data", async function () {
       const { provider, kofi, kojo } = await loadFixture(
-        deployAssetPriceProviderWithKofiProvder
+        deployMultiAssetPriceProviderWithKofiProvder
       );
       const coder = new ethers.AbiCoder();
       const assetSymbol = "BTC";
@@ -194,7 +209,7 @@ describe("AssetPriceProvider", function () {
   describe("Get Data", function () {
     it("Should Get Data", async function () {
       const { provider, kofi } = await loadFixture(
-        deployAssetPriceProviderWithKofiProvder
+        deployMultiAssetPriceProviderWithKofiProvder
       );
       const coder = new ethers.AbiCoder();
       const assetSymbol = "BTC";
@@ -205,7 +220,7 @@ describe("AssetPriceProvider", function () {
         [assetSymbol, date, price]
       );
       await expect(provider.connect(kofi).provideData(param))
-        .to.emit(provider, "AssetPriceProvided")
+        .to.emit(provider, "MultiAssetPriceProvided")
         .withArgs(await kofi.getAddress(), assetSymbol, date, price);
       const assetDateParam = coder.encode(
         ["string", "uint256"],
@@ -219,7 +234,7 @@ describe("AssetPriceProvider", function () {
     });
     it("Should Fail to Get Data", async function () {
       const { provider, kofi, kojo } = await loadFixture(
-        deployAssetPriceProviderWithKofiProvder
+        deployMultiAssetPriceProviderWithKofiProvder
       );
       const coder = new ethers.AbiCoder();
       const assetSymbol = "BTC";
@@ -229,6 +244,34 @@ describe("AssetPriceProvider", function () {
         .to.revertedWithCustomError(provider, "InvalidAssetSymbolDate")
         .withArgs(assetSymbol, date);
       expect(await provider.connect(kojo).hasData(param)).to.be.false;
+    });
+  });
+  describe("Have Options", function () {
+    it("Should Have Options", async function () {
+      const { provider, kofi } = await loadFixture(
+        deployMultiAssetPriceProviderWithKofiProvder
+      );
+      const coder = new ethers.AbiCoder();
+      const options = [
+        [100, 200],
+        [300, 400],
+        [500, 600],
+      ].map((o) => coder.encode(["uint256", "uint256"], o));
+      const params = coder.encode(["bytes[]"], [options]);      
+      expect(await provider.connect(kofi).hasOptions(params)).to.be.true;
+    });
+    it("Should Fail to Have Options", async function () {
+      const { provider, kofi } = await loadFixture(
+        deployMultiAssetPriceProviderWithKofiProvder
+      );
+      const coder = new ethers.AbiCoder();
+      const options = [
+        [9000, 200],
+        [300, 400],
+        [500, 600],
+      ].map((o) => coder.encode(["uint256", "uint256"], o));
+      const params = coder.encode(["bytes[]"], [options]);
+      expect(await provider.connect(kofi).hasOptions(params)).to.be.false;
     });
   });
 });

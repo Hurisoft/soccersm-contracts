@@ -19,10 +19,6 @@ async function deployChallengePool() {
   const footBallScoreProvider = await FootballScoreProvider.deploy();
 
   await footBallScoreProvider.addProvider(owner);
-  console.log(
-    await footBallScoreProvider.getAddress(),
-    "FootballScoreProvider"
-  );
 
   const FootballOutcomeEvaluator = await ethers.getContractFactory(
     "FootballOutcomeEvaluator"
@@ -30,11 +26,6 @@ async function deployChallengePool() {
 
   const footBallOutcomeEvaluator = await FootballOutcomeEvaluator.deploy(
     footBallScoreProvider
-  );
-
-  console.log(
-    await footBallOutcomeEvaluator.getAddress(),
-    "FootballOutcomeEvaluator"
   );
 
   await footBallScoreProvider.addReader(
@@ -48,10 +39,6 @@ async function deployChallengePool() {
   const footBallOverUnderEvaluator = await FootballOverUnderEvaluator.deploy(
     footBallScoreProvider
   );
-  console.log(
-    await footBallOverUnderEvaluator.getAddress(),
-    "FootballOverUnderEvaluator"
-  );
 
   await footBallScoreProvider.addReader(
     await footBallOverUnderEvaluator.getAddress()
@@ -63,10 +50,6 @@ async function deployChallengePool() {
 
   const footBallCorrectScoreEvaluator =
     await FootBallCorrectScoreEvaluator.deploy(footBallScoreProvider);
-  console.log(
-    await footBallCorrectScoreEvaluator.getAddress(),
-    "FootBallCorrectScoreEvaluator"
-  );
 
   await footBallScoreProvider.addReader(
     await footBallCorrectScoreEvaluator.getAddress()
@@ -78,7 +61,6 @@ async function deployChallengePool() {
   const assetPriceProvider = await AssetPriceProvider.deploy();
 
   await assetPriceProvider.addProvider(owner);
-  console.log(await assetPriceProvider.getAddress(), "AssetPriceProvider");
 
   const AssetPriceBoundedEvaluator = await ethers.getContractFactory(
     "AssetPriceBoundedEvaluator"
@@ -86,11 +68,6 @@ async function deployChallengePool() {
 
   const assetPriceBoundedEvaluator = await AssetPriceBoundedEvaluator.deploy(
     assetPriceProvider
-  );
-
-  console.log(
-    await assetPriceBoundedEvaluator.getAddress(),
-    "AssetPriceBoundedEvaluator"
   );
 
   await assetPriceProvider.addReader(
@@ -105,11 +82,6 @@ async function deployChallengePool() {
     assetPriceProvider
   );
 
-  console.log(
-    await assetPriceTargetEvaluator.getAddress(),
-    "AssetPriceTargetEvaluator"
-  );
-
   await assetPriceProvider.addReader(
     await assetPriceTargetEvaluator.getAddress()
   );
@@ -120,21 +92,12 @@ async function deployChallengePool() {
   const generalStatementProvider = await GeneralStatementProvider.deploy();
 
   await generalStatementProvider.addProvider(owner);
-  console.log(
-    await generalStatementProvider.getAddress(),
-    "GeneralStatementProvider"
-  );
-
   const GeneralStatementEvaluator = await ethers.getContractFactory(
     "GeneralStatementEvaluator"
   );
 
   const generalStatementEvaluator = await GeneralStatementEvaluator.deploy(
     await generalStatementProvider.getAddress()
-  );
-  console.log(
-    await generalStatementEvaluator.getAddress(),
-    "GeneralStatementEvaluator"
   );
 
   await generalStatementProvider.addReader(
@@ -175,20 +138,6 @@ async function deployChallengePool() {
     "Any and all statements",
     await generalStatementEvaluator.getAddress()
   ); // 5
-  console.log(
-    await assetPriceBoundedEvaluator.getAddress(),
-    "assetPriceBoundedEvaluator\n",
-    await assetPriceTargetEvaluator.getAddress(),
-    "assetPriceTargetEvaluator\n",
-    await footBallCorrectScoreEvaluator.getAddress(),
-    "footBallCorrectScoreEvaluator\n",
-    await footBallOverUnderEvaluator.getAddress(),
-    "footBallOverUnderEvaluator\n",
-    await footBallOutcomeEvaluator.getAddress(),
-    "footBallOutcomeEvaluator\n",
-    await generalStatementEvaluator.getAddress(),
-    "generalStatementEvaluator\n"
-  );
 
   const topicIds = {
     outcome: 0,

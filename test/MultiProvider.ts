@@ -22,7 +22,6 @@ export async function deployMultiProvider() {
   const assetProvider = await AssetPriceProvider.deploy();
 
   await assetProvider.addProvider(await multiProvider.getAddress());
-  console.log(await assetProvider.getAddress(), "AssetPriceProvider");
 
   const FootballScoreProvider = await ethers.getContractFactory(
     "FootballScoreProvider"
@@ -30,7 +29,6 @@ export async function deployMultiProvider() {
   const footballProvider = await FootballScoreProvider.deploy();
 
   await footballProvider.addProvider(await multiProvider.getAddress());
-  console.log(await footballProvider.getAddress(), "FootballScoreProvider");
 
   return {
     owner,

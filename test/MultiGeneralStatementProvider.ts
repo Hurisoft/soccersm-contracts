@@ -21,7 +21,6 @@ export async function deployMultiGeneralStatementProvider() {
 
   await provider.addProvider(owner);
   await provider.addReader(kwame);
-  console.log(await provider.getAddress(), "MultiGeneralStatementProvider");
 
   return {
     owner,

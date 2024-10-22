@@ -307,6 +307,9 @@ abstract contract IMultiChallengePool is Helpers {
         if (_pollOptions.length > maxOptionsPerPool) {
             revert InvalidOptionsLength();
         }
+        if (_pollOptions.length < 2) {
+            revert InvalidOptionsLength();
+        }
         if (_pollMaturity < (block.timestamp + minMaturityPeriod)) {
             revert InvalidPollMaturity(
                 (block.timestamp + minMaturityPeriod) - _pollMaturity
@@ -398,8 +401,7 @@ abstract contract IMultiChallengePool is Helpers {
         if (!optionTickets[_challengeId][_userPrediction].isOption) {
             revert InvalidPrediction();
         }
-        if
-         (tickets[msg.sender][_challengeId].quantity > 0) {
+        if (tickets[msg.sender][_challengeId].quantity > 0) {
             revert PlayerAlreadyInPool();
         }
         Challenge storage challenge = challengePools[_challengeId];
@@ -538,10 +540,13 @@ abstract contract IMultiChallengePool is Helpers {
         if (playerTicket.quantity == 0) {
             revert PlayerNotInPool();
         }
-        if (!compareBytes(playerTicket.choice, challenge.result)) {
-            revert PlayerDidNotWinPool();
+        
+        if (optionTickets[_challengeId][challenge.result].totalSupply > 0) {
+            if (!compareBytes(playerTicket.choice, challenge.result)) {
+                revert PlayerDidNotWinPool();
+            }
+            winShare = _computeWinnerShare(challenge, _challengeId);
         }
-        winShare = _computeWinnerShare(challenge, _challengeId);
 
         totalWithdrawal = challenge.stake + winShare;
     }

@@ -261,7 +261,11 @@ describe("MultiChallengePoolFootBallScoreRange", function () {
         { length: 101 },
         (_, i) => options[0]
       );
-      const invalidPollParam: string[] = [];
+      const invalidPollParam = [
+        coder.encode(["uint256", "uint256"], [BigInt(1), BigInt(2)]),
+        coder.encode(["uint256", "uint256"], [BigInt(3), BigInt(4)]),
+        coder.encode(["uint256", "uint256"], [BigInt(7), BigInt(4)]),
+      ];
       const invalidPollOption = [
         coder.encode(["uint256", "uint256"], [BigInt(1), BigInt(2)]),
         coder.encode(["uint256", "uint256"], [BigInt(7), BigInt(9)]),

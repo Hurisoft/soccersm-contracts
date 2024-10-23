@@ -6,10 +6,12 @@ import "../interfaces/IMultiEvaluator.sol";
 
 import "../utils/Helpers.sol";
 
+import "hardhat/console.sol";
+
 contract MultiFootBallScoreOutcomeEvaluator is IMultiEvaluator {
-    bytes public constant HOME = "home";
-    bytes public constant AWAY = "away";
-    bytes public constant DRAW = "draw";
+    string public constant HOME = "home";
+    string public constant AWAY = "away";
+    string public constant DRAW = "draw";
     constructor(
         address _dataProvider
     ) IMultiEvaluator(_dataProvider) Ownable(msg.sender) {}
@@ -43,9 +45,9 @@ contract MultiFootBallScoreOutcomeEvaluator is IMultiEvaluator {
 
     function _isOutcome(bytes memory outcome) internal pure returns (bool) {
         if (
-            !compareBytes(outcome, HOME) &&
-            !compareBytes(outcome, AWAY) &&
-            !compareBytes(outcome, DRAW)
+            !compareBytes(outcome, abi.encode(HOME)) &&
+            !compareBytes(outcome, abi.encode(AWAY)) &&
+            !compareBytes(outcome, abi.encode(DRAW))
         ) {
             return false;
         }
@@ -57,11 +59,11 @@ contract MultiFootBallScoreOutcomeEvaluator is IMultiEvaluator {
         uint256 awayScore
     ) internal pure returns (bytes memory) {
         if (homeScore > awayScore) {
-            return HOME;
+            return abi.encode(HOME);
         } else if (awayScore > homeScore) {
-            return AWAY;
+            return abi.encode(AWAY);
         } else {
-            return DRAW;
+            return abi.encode(DRAW);
         }
     }
 

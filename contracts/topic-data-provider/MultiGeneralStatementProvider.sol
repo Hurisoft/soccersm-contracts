@@ -7,8 +7,6 @@ import "../utils/DataProviderAccess.sol";
 import "../utils/Helpers.sol";
 import "../interfaces/IChallengePool.sol";
 
-// import "hardhat/console.sol";
-
 contract MultiGeneralStatementProvider is
     IMultiTopicDataProvider,
     DataProviderAccess,

@@ -336,6 +336,9 @@ abstract contract IMultiChallengePool is Helpers {
         }
         bool _userPredictionValid = false;
         for (uint256 i = 0; i < _pollOptions.length; i++) {
+            if(compareBytes(emptyBytes, _pollOptions[i])) {
+                revert InvalidPollOption();
+            }
             if (
                 compareBytes(_userPrediction, _pollOptions[i]) &&
                 !_userPredictionValid

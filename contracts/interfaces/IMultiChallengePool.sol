@@ -8,7 +8,7 @@ import "./IMultiTopicRegistry.sol";
 import "./IMultiEvaluator.sol";
 import "../utils/Helpers.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 abstract contract IMultiChallengePool is Helpers {
     enum PoolState {

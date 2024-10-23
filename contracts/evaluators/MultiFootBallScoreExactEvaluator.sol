@@ -15,10 +15,6 @@ contract MultiFootBallScoreExactEvaluator is IMultiEvaluator {
         IMultiChallengePool.Poll calldata _poll
     ) external override returns (bool) {
         uint256 matchId = abi.decode(_poll.pollParam, (uint256));
-        bool options = this.hasOptions(abi.encode(_poll.options));
-        if (!options) {
-            return false;
-        }
         bool success = dataProvider().requestData(abi.encode(matchId));
         return success;
     }
@@ -35,26 +31,12 @@ contract MultiFootBallScoreExactEvaluator is IMultiEvaluator {
             dataProvider().getData(encodedMatchId),
             (uint256, uint256)
         );
-        uint256 totalScore = homeScore + awayScore;
-        for (uint256 i = 0; i < _poll.options.length; i++) {
-            uint256 total = abi.decode(_poll.options[i], (uint256));
-            if (totalScore == total) {
-                return _poll.options[i];
-            }
-        }
-        return emptyBytes;
+        return abi.encode(homeScore + awayScore);
     }
 
     function hasOptions(
-        bytes calldata _params
+        bytes calldata /*_params*/
     ) external pure override returns (bool) {
-        bytes[] memory options = abi.decode(_params, (bytes[]));
-        if(options.length == 0) {
-            return false;
-        }
-        for (uint256 i = 0; i < options.length; i++) {
-            abi.decode(options[i], (uint256));
-        }
         return true;
     }
 }

@@ -6,7 +6,7 @@ import "../interfaces/IMultiEvaluator.sol";
 
 import "../utils/Helpers.sol";
 
-contract MultiFootBallScoreExactEvaluator is IMultiEvaluator {
+contract MultiFootBallScoreOutcomeEvaluator is IMultiEvaluator {
     bytes public constant HOME = "home";
     bytes public constant AWAY = "away";
     bytes public constant DRAW = "draw";

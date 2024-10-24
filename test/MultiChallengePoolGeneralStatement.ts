@@ -21,7 +21,9 @@ async function deployChallengePool() {
     yaa,
   ] = await ethers.getSigners();
 
-  const MultiTopicRegistry = await ethers.getContractFactory("MultiTopicRegistry");
+  const MultiTopicRegistry = await ethers.getContractFactory(
+    "MultiTopicRegistry"
+  );
   const registry = await MultiTopicRegistry.deploy();
 
   const MultiGeneralStatementProvider = await ethers.getContractFactory(
@@ -143,13 +145,14 @@ async function deployCreateChallenges() {
     ethers.hexlify(ethers.toUtf8Bytes("NPP")),
     ethers.hexlify(ethers.toUtf8Bytes("NDC")),
     ethers.hexlify(ethers.toUtf8Bytes("NEW FORCE")),
+    ethers.hexlify(ethers.toUtf8Bytes("CPP")),
   ];
   const param1 = coder.encode(["uint256"], [statementId]);
   const dataProvided = coder.encode(
     ["uint256", "string", "uint256", "bytes", "bytes[]"],
     [statementId, statement, maturity, result, options]
   );
-  const result2 = ethers.toUtf8Bytes("NEW FORCE");
+  const result2 = ethers.toUtf8Bytes("CPP");
   const param2 = coder.encode(
     ["uint256", "string", "uint256", "bytes", "bytes[]"],
     [statementId, statement, maturity, result2, options]
@@ -223,7 +226,7 @@ async function deployCreateChallenges() {
 describe("MultiChallengePoolGeneralStatement", function () {
   before(function () {
     // runs once before the first test in this block
-    reset()
+    reset();
   });
   describe("Deployment", function () {
     it("Should Deploy Pool", async function () {
@@ -571,12 +574,7 @@ describe("MultiChallengePoolGeneralStatement", function () {
 
       await expect(pool.connect(otherAccount).withdrawWinnings(0))
         .emit(pool, "WinningsWithdrawn")
-        .withArgs(
-          await otherAccount.getAddress(),
-          0,
-          BigInt(3) * poolStake,
-          BigInt(2) * poolStake
-        );
+        .withArgs(await otherAccount.getAddress(), 0, poolStake, 0);
     });
     it("Should Fail to Withdraw Winnings", async function () {
       const {
@@ -596,6 +594,7 @@ describe("MultiChallengePoolGeneralStatement", function () {
         param1,
         owner,
         poolStake,
+        yaa,
       } = await loadFixture(deployCreateChallenges);
       const kwamePrediction = ethers.toUtf8Bytes("NDC");
       await ballsToken.transfer(kwame, airDropBalls);
@@ -616,6 +615,17 @@ describe("MultiChallengePoolGeneralStatement", function () {
         pool.connect(adwoa).joinChallenge(0, adwoaPrediction, 1)
       ).emit(pool, "JoinChallengePool");
 
+      const yaaPrediction = ethers.toUtf8Bytes("CPP");
+
+      await ballsToken.transfer(yaa, airDropBalls);
+
+      await ballsToken.connect(yaa).approve(pool, joinStakeFee);
+
+      await expect(pool.connect(yaa).joinChallenge(0, yaaPrediction, 1)).emit(
+        pool,
+        "JoinChallengePool"
+      );
+
       const coder = new ethers.AbiCoder();
 
       await time.increase(60 * 60 * 101);
@@ -633,16 +643,16 @@ describe("MultiChallengePoolGeneralStatement", function () {
         .emit(pool, "ClosedChallengePool")
         .withArgs(0, await kojo.getAddress(), 1, ethers.hexlify(result2));
 
-      await expect(pool.connect(otherAccount).withdrawWinnings(0))
+      await expect(pool.connect(yaa).withdrawWinnings(0))
         .emit(pool, "WinningsWithdrawn")
         .withArgs(
-          await otherAccount.getAddress(),
+          await yaa.getAddress(),
           0,
-          BigInt(3) * poolStake,
-          BigInt(2) * poolStake
+          BigInt(4) * poolStake,
+          BigInt(3) * poolStake
         );
       await expect(
-        pool.connect(otherAccount).withdrawWinnings(0)
+        pool.connect(yaa).withdrawWinnings(0)
       ).revertedWithCustomError(pool, "PlayerWinningAlreadyWithdrawn");
       await expect(
         pool.connect(kwame).withdrawWinnings(0)

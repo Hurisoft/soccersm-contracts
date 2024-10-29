@@ -154,4 +154,8 @@ contract MultiChallengePool is IMultiChallengePool, Ownable {
         accumulatedFee = 0;
         SafeERC20.safeTransfer(balls, feeAddress, amount);
     }
+
+    function setContractURI(string memory _uri) external override onlyOwner {
+        contractURI = _uri;
+    }
 }

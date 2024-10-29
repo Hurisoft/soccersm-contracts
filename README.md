@@ -74,7 +74,7 @@ Url - <https://sepolia-blockscout.lisk.com/address/0xB2002EaFC86DD21eaDAed4b1a78
 
 Deploy - `npx hardhat run scripts/deploy_multi_challenge_pool.ts --network liskTestnet`
 Verify - `npx hardhat verify --network liskTestnet --constructor-args contract-args/multi_challenge_pool.ts [MULTI_CHALLENGE_POOL]`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0xF9Ae3039535F030c9e8118C71FC68DE1089f5a0a>
 
 #### Deploy Providers
 
@@ -100,7 +100,13 @@ Url - <https://sepolia-blockscout.lisk.com/address/0xF5Bd8F96A9cb7e27a838aFA4AF5
 
 Deploy - `npx hardhat run scripts/deploy_multi_provider.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0x3CB9BAf9b481c38940aeb1EBfc0Dc25B9707A39b>
+
+##### Multi Sender
+
+Deploy - `npx hardhat run scripts/deploy_multi_send.ts --network liskTestnet`
+Verify - `npx hardhat verify [MULTIPLE_SEND] --network liskTestnet`
+Url - <https://sepolia-blockscout.lisk.com/address/0xDEa41a7FC992A02504f170a0cCE0b6225d41815c>
 
 #### Deploy Evaluators
 
@@ -144,7 +150,7 @@ Url - <https://sepolia-blockscout.lisk.com/address/0xEd64A15A6223588794A976d3449
 
 Deploy - `npx hardhat run scripts/deploy_multi_general_statement_evaluator.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_EVALUATOR] [MULTI_GENERAL_STATEMENT_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/0xd96c0BDC90b3fc41F15d348c3D539e427162F5B7>
+Url - <https://sepolia-blockscout.lisk.com/address/0x252Ba1b6E8b97Fa4759d4F180244810C612B273F>
 
 #### Create Topics
 
@@ -168,46 +174,46 @@ Url - <https://sepolia-blockscout.lisk.com/address/0xd96c0BDC90b3fc41F15d348c3D5
 
 Deploy - `npx hardhat run scripts/deploy_multi_general_statement_provider.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_GENERAL_STATEMENT_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0x85a14478ACB2D22C740CB69e15C744b8173C5Ae8>
 
 ##### Multi Asset Price Provider
 
 Deploy - `npx hardhat run scripts/deploy_multi_asset_price_provider.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_ASSET_PRICE_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0xC080c3Bad87f90F00ce49C5953dFDd1189918adA>
 
 ##### Multi Football Score Provider
 
-Deploy - `npx hardhat run scripts/deploy_multi_football_socre_provider.ts --network liskTestnet`
+Deploy - `npx hardhat run scripts/deploy_multi_football_score_provider.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0x466182Fb77589D613BcbF2302833Ac8A17f37818>
 
 ##### Multi Asset Range Evaluator
 
 Deploy - `npx hardhat run scripts/deploy_multi_asset_range_evaluator.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_ASSET_RANGE_EVALUATOR] [MULTI_ASSET_PRICE_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0x87d35Fe9D988C82C7BD15aA887a8939632d27fF0>
 
 ##### Multi Football Score Range Evaluator
 
 Deploy - `npx hardhat run scripts/deploy_multi_football_score_range_evaluator.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_FOOTBALL_SCORE_RANGE_EVALUATOR] [MULTI_FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0x97920aaafA60CdEfe0723Dc909923097D887B742>
 
 ##### Multi Football Score Exact Evaluator
 
 Deploy - `npx hardhat run scripts/deploy_multi_football_score_exact_evaluator.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_FOOTBALL_SCORE_EXACT_EVALUATOR] [MULTI_FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0xf90c0c0Fdc30E9B248c47CAD7236a25beA881a65>
 
 ##### Multi Football Score Outcome Evaluator
 
 Deploy - `npx hardhat run scripts/deploy_multi_football_score_outcome_evaluator.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_FOOTBALL_SCORE_OUTCOME_EVALUATOR] [MULTI_FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0xf86E39eED355510f74350693065da0f5239bf4aA>
 
 ##### Multi Football Score Correct Score Evaluator
 
 Deploy - `npx hardhat run scripts/deploy_multi_football_correct_score_evaluator.ts --network liskTestnet`
 Verify - `npx hardhat verify [MULTI_FOOTBALL_SCORE_CORRECT_SCORE_EVALUATOR] [MULTI_FOOTBALL_SCORE_PROVIDER] --network liskTestnet`
-Url - <https://sepolia-blockscout.lisk.com/address/>
+Url - <https://sepolia-blockscout.lisk.com/address/0x0bbF53B07F6a5C55CC2F5B489dD6b32F53377664>

@@ -336,7 +336,7 @@ abstract contract IMultiChallengePool is Helpers {
         }
         bool _userPredictionValid = false;
         for (uint256 i = 0; i < _pollOptions.length; i++) {
-            if(compareBytes(emptyBytes, _pollOptions[i])) {
+            if (compareBytes(emptyBytes, _pollOptions[i])) {
                 revert InvalidPollOption();
             }
             if (
@@ -543,7 +543,7 @@ abstract contract IMultiChallengePool is Helpers {
         if (playerTicket.quantity == 0) {
             revert PlayerNotInPool();
         }
-        
+
         if (optionTickets[_challengeId][challenge.result].totalSupply > 0) {
             if (!compareBytes(playerTicket.choice, challenge.result)) {
                 revert PlayerDidNotWinPool();
@@ -664,6 +664,8 @@ abstract contract IMultiChallengePool is Helpers {
         uint256 amount
     );
 
+    string public contractURI;
+
     /// @notice Spender allowance of an id.
     mapping(address owner => mapping(address spender => mapping(uint256 id => uint256 amount)))
         public allowance;
@@ -672,7 +674,7 @@ abstract contract IMultiChallengePool is Helpers {
     mapping(address owner => mapping(address spender => bool))
         public isOperator;
 
-    modifier isTicketWithdrawn(address owner, uint256 id) {
+    modifier ticketNotWithdrawn(address owner, uint256 id) {
         if (tickets[owner][id].withdrawn) {
             revert TicketWithdrawn(owner, id);
         }
@@ -701,7 +703,7 @@ abstract contract IMultiChallengePool is Helpers {
         address to,
         uint256 id,
         uint256 amount
-    ) internal isTicketWithdrawn(from, id) isTicketWithdrawn(to, id) {
+    ) internal ticketNotWithdrawn(from, id) ticketNotWithdrawn(to, id) {
         Ticket storage senderTicket = tickets[from][id];
         Ticket storage receiverTicket = tickets[to][id];
         if (senderTicket.quantity < amount) {
@@ -784,5 +786,13 @@ abstract contract IMultiChallengePool is Helpers {
         bytes4 interfaceId
     ) public pure returns (bool supported) {
         return interfaceId == 0x0f632fb3 || interfaceId == 0x01ffc9a7;
+    }
+
+    function setContractURI(string memory _uri) external virtual;
+
+    /// @notice The URI for each id.
+    /// @return The URI of the token.
+    function tokenURI(uint256) public pure returns (string memory) {
+        return "<baseuri>/{id}";
     }
 }

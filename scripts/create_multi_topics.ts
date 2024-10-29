@@ -6,8 +6,8 @@ async function main() {
     process.env.MULTI_TOPIC_REGISTRY!
   );
   await shadow.createTopic(
-    "Football Score Correct Score",
-    "Predict if outcome of football match will be one of the correct scores",
+    "FootBall Correct Score",
+    "FootBall Correct Score",
     process.env.MULTI_FOOTBALL_SCORE_CORRECT_SCORE_EVALUATOR!
   );
 

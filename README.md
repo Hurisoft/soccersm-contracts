@@ -156,9 +156,17 @@ Url - <https://sepolia-blockscout.lisk.com/address/0x252Ba1b6E8b97Fa4759d4F18024
 
 `npx hardhat run scripts/create_topics.ts --network liskTestnet`
 
+#### Create Multi Topics
+
+`npx hardhat run scripts/create_multi_topics.ts --network liskTestnet`
+
 #### Create General Statements
 
 `npx hardhat run scripts/create_statements.ts --network liskTestnet`
+
+#### Create Multi General Statements
+
+`npx hardhat run scripts/create_multi_statements.ts --network liskTestnet`
 
 #### Games
 

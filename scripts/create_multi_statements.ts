@@ -9,13 +9,11 @@ async function main() {
   const statementId = 3;
   const maturity = 1730937600;
   const result = ethers.toUtf8Bytes("");
-  const statement = "Winner of US 2024 Presidential Election?";
+  const statement = "Mike Tyson vrs. Jake Paul: Who wins?";
   const options = [
-    "Donald Trump",
-    "Kamala Haris",
-    "Cornel West",
-    "Jill Stein",
-    "Chase Oliver",
+    "Mike Tyson",
+    "Jake Paul",
+    "Draw or Not Scored"
   ].map((op) => ethers.toUtf8Bytes(op));
   const param = coder.encode(
     ["uint256", "string", "uint256", "bytes", "bytes[]"],

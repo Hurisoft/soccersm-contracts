@@ -6,6 +6,7 @@ import "@nomicfoundation/hardhat-toolbox";
 dotenv.config();
 
 const config: HardhatUserConfig = {
+  defaultNetwork: "liskTestnet",
   solidity: {
     version: "0.8.26",
     settings: {

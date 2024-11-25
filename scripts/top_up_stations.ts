@@ -109,8 +109,8 @@ async function main() {
     "0x316EEfcd7f8e6703d63ad82bfb04602a61E7D2CC",
   ];
 
-  await shadow.transfer(tanks, ethers.parseEther("0.02"), {
-    value: ethers.parseEther("2"),
+  await shadow.transfer(tanks, ethers.parseEther("0.01"), {
+    value: ethers.parseEther("1"),
   });
   console.log("Top Ups Made ...");
 }

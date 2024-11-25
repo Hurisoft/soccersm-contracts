@@ -8,12 +8,14 @@ async function main() {
   const coder = new ethers.AbiCoder();
   const statementId = 3;
   const maturity = 1730937600;
-  const result = ethers.toUtf8Bytes("");
-  const statement = "Mike Tyson vrs. Jake Paul: Who wins?";
+  const result = ethers.toUtf8Bytes("Donald Trump");
+  const statement = "Winner of US 2024 Presidential Election?";
   const options = [
-    "Mike Tyson",
-    "Jake Paul",
-    "Draw or Not Scored"
+    "Donald Trump",
+    "Kamala Haris",
+    "Cornel West",
+    "Jill Stein",
+    "Chase Oliver",
   ].map((op) => ethers.toUtf8Bytes(op));
   const param = coder.encode(
     ["uint256", "string", "uint256", "bytes", "bytes[]"],

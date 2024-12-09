@@ -1,7 +1,9 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const shadow = await ethers.deployContract("MultiSend");
+  const shadow = await ethers.deployContract("BallsAirDrop", [
+    process.env.BALLS!,
+  ]);
 
   await shadow.waitForDeployment();
 
@@ -17,4 +19,3 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
-
